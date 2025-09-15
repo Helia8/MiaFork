@@ -18,13 +18,13 @@ import com.mineinabyss.guiy.modifiers.click.clickable
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.guiy.navigation.UniversalScreens
-import com.mineinabyss.idofront.entities.title
 import com.mineinabyss.idofront.messaging.error
+import com.mineinabyss.idofront.nms.entities.title
 import com.mineinabyss.idofront.resourcepacks.ResourcePacks
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.ItemLore
-import net.wesjd.anvilgui.AnvilGUI
+import io.papermc.paper.registry.data.dialog.input.DialogInput
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
@@ -83,7 +83,7 @@ fun ScrollUpButton(modifier: Modifier = Modifier) {
 @Composable
 fun GuildUIScope.InviteToGuildButton(modifier: Modifier) {
     val guildInvitePaper = TitleItem.of("Player Name")
-    guildInvitePaper.setData(DataComponentTypes.HIDE_TOOLTIP)
+    guildInvitePaper.setData(DataComponentTypes.TOOLTIP_DISPLAY, TitleItem.hideTooltip)
     Button(
         enabled = player.isCaptainOrAbove(),
         modifier = modifier,
@@ -94,19 +94,15 @@ fun GuildUIScope.InviteToGuildButton(modifier: Modifier) {
                 player.error("Change it to 'ANY' or 'INVITE-only' mode to invite others.")
                 return@Button
             }
-            nav.open(
-                UniversalScreens.Anvil(
-                AnvilGUI.Builder()
-                    .title(":space_-61::guild_search_menu:")
-                    .itemLeft(guildInvitePaper)
-                    .itemOutput(TitleItem.transparentItem)
-                    .plugin(guiyPlugin)
-                    .onClose { nav.back() }
-                    .onClick { _, snapshot ->
-                        snapshot.player.invitePlayerToGuild(snapshot.text)
-                        listOf(AnvilGUI.ResponseAction.close())
-                    }
-            ))
+
+            val dialog = GuildDialogs(":space_-28::guild_search_menu:", "Send Guild-Invite!", listOf(
+                DialogInput.text("guild_dialog", "<gold>Search for Player to invite to your Guild...".miniMsg())
+                    .initial("").width(200)
+                    .maxLength(64)
+                    .build()
+            )).createGuildLookDialog { player.invitePlayerToGuild(it) }
+
+            player.showDialog(dialog)
         }
     ) {
         Text("<yellow><b>INVITE Player to Guild".miniMsg())
