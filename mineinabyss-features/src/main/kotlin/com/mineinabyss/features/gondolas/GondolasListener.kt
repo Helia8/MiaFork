@@ -10,6 +10,11 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerMoveEvent
 import java.util.UUID
 import com.mineinabyss.idofront.textcomponents.miniMsg
+import org.bukkit.plugin.java.JavaPlugin
+import kotlin.collections.remove
+import kotlin.compareTo
+import kotlin.div
+import kotlin.text.get
 
 class GondolasListener : Listener {
     private val playerZoneEntry = mutableMapOf<UUID, Pair<String, Long>>()
@@ -47,6 +52,21 @@ class GondolasListener : Listener {
         }
     }
 
+    fun startCooldownDisplayTask(plugin: JavaPlugin) {
+        plugin.server.scheduler.runTaskTimer(plugin, Runnable {
+            val now = System.currentTimeMillis()
+            for ((uuid, entry) in playerZoneEntry) {
+                val player = plugin.server.getPlayer(uuid) ?: continue
+                val gondolaData = LoadedGondolas.loaded[entry.first] ?: continue
+                val remaining = gondolaData.warpCooldown - (now - entry.second)
+                if (remaining > 0) {
+                    val seconds = remaining / 1000
+                    player.sendActionBar("Warping in $seconds seconds...")
+                }
+            }
+        }, 1L, 1L)
+    }
+    
     private fun handleWarpCooldown(
         player: Player,
         data: GondolaData,
