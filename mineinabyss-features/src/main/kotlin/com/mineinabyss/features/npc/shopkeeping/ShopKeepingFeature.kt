@@ -11,13 +11,34 @@ import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.features.Feature
 import com.mineinabyss.idofront.features.FeatureDSL
 import com.mineinabyss.idofront.plugin.listeners
+import com.mineinabyss.features.abyss
+import com.mineinabyss.idofront.config.config
+import com.mineinabyss.idofront.messaging.info
+
 
 class ShopKeepingFeature : Feature() {
 
     override fun FeatureDSL.enable() {
-        plugin.listeners(ShopKeepingListener())
+        val config by config<NpcsConfig>("npcs", abyss.dataPath, NpcsConfig())
+        plugin.listeners(ShopKeepingListener(config, plugin))
 
         mainCommand {
+            "npcReload" {
+                  val config by config<NpcsConfig>("npcs", abyss.dataPath, NpcsConfig())
+                  plugin.listeners(ShopKeepingListener(config, plugin))
+                playerAction {
+                    player.info("NPC config reloaded, changes will take effect when chunks are reloaded")
+                }
+//                // todo: remove
+//                val world = plugin.server.worlds.first()
+//                val configa = config.npcs.firstOrNull()
+//                println(config)
+//                if (configa != null) {
+//
+//                val npcentity = NpcEntity(configa, world, plugin)
+//                npcentity.createNpc()
+//                }
+            }
             "shops" {
                 val shopKey by optionArg(options = ShopKeepers.getKeys().map { it.toString() }) {
                     parseErrorMessage = { "No such shopkeeper: $passed" }

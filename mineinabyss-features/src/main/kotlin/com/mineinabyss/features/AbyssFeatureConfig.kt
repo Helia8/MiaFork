@@ -10,6 +10,7 @@ import com.mineinabyss.features.custom_hud.CustomHudFeature
 import com.mineinabyss.features.descent.DescentFeature
 import com.mineinabyss.features.displayLocker.DisplayLockerFeature
 import com.mineinabyss.features.gondolas.GondolaFeature
+import com.mineinabyss.features.gorebag.GorebagFeature
 import com.mineinabyss.features.guilds.GuildFeature
 import com.mineinabyss.features.hubstorage.HubStorageFeature
 import com.mineinabyss.features.keepinventory.KeepInvFeature
@@ -93,6 +94,7 @@ class AbyssFeatureConfig(
             add(tools.enabled) { ToolsFeature() }
             add(tutorial.enabled) { TutorialFeature() }
             add(ansiblePull.enabled) { ConfigPullFeature() }
+            add(true) { GorebagFeature() }
         }
     }
 }

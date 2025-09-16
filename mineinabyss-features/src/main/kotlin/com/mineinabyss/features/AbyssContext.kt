@@ -51,3 +51,4 @@ class AbyssContext(
 
     val db = Database.connect("jdbc:sqlite:" + plugin.dataFolder.path + "/data.db", "org.sqlite.JDBC")
 }
+
