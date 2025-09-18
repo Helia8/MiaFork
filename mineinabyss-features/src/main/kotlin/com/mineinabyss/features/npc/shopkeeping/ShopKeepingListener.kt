@@ -3,7 +3,7 @@ package com.mineinabyss.features.npc.shopkeeping
 import com.mineinabyss.components.npc.shopkeeping.ShopKeeper
 import com.mineinabyss.features.npc.shopkeeping.menu.ShopMainMenu
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
-import com.mineinabyss.guiy.inventory.guiy
+import com.mineinabyss.guiy.canvas.guiy
 import org.bukkit.Sound
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

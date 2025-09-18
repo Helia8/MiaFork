@@ -9,6 +9,7 @@ import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
+import com.mineinabyss.guiy.navigation.LocalBackGestureDispatcher
 import com.mineinabyss.idofront.textcomponents.miniMsg
 
 @Composable
@@ -34,12 +35,15 @@ fun GuildUIScope.LeaveButton(modifier: Modifier = Modifier) = Button(
 }
 
 @Composable
-fun GuildUIScope.DontLeaveButton(modifier: Modifier = Modifier) = Button(
-    modifier,
-    onClick = { nav.back() }
-) {
-    Text(
-        "<red><b>Don't Leave <dark_red><i>${guildName}".miniMsg(),
-        modifier = Modifier.size(3, 3)
-    )
+fun GuildUIScope.DontLeaveButton(modifier: Modifier = Modifier) {
+    val dispatcher = LocalBackGestureDispatcher.current
+    Button(
+        modifier,
+        onClick = { dispatcher?.onBack() }
+    ) {
+        Text(
+            "<red><b>Don't Leave <dark_red><i>${guildName}".miniMsg(),
+            modifier = Modifier.size(3, 3)
+        )
+    }
 }

@@ -1,7 +1,7 @@
 package com.mineinabyss.features.pvp
 
 import com.mineinabyss.features.helpers.layer
-import com.mineinabyss.guiy.inventory.guiy
+import com.mineinabyss.guiy.canvas.guiy
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.features.Feature
 import com.mineinabyss.idofront.features.FeatureDSL

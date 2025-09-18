@@ -16,11 +16,15 @@ import io.papermc.paper.registry.data.dialog.input.DialogInput
 import org.bukkit.entity.Player
 
 @Composable
-fun GuildUIScope.GuildInfoScreen() {
+fun GuildUIScope.GuildInfoScreen(
+    onNavigateToMemberList: () -> Unit,
+    onNavigateToDisband: () -> Unit,
+    onNavigateToLeave: () -> Unit,
+) {
     val isOwner = player.isGuildOwner()
     Column(Modifier.at(2, 0)) {
         Row {
-            GuildMemberManagement()
+            GuildMemberManagement(onClick = onNavigateToMemberList)
             Spacer(width = 1)
             if (isOwner) GuildRenameButton()
             else CurrentGuildInfoButton()
@@ -35,9 +39,9 @@ fun GuildUIScope.GuildInfoScreen() {
 
     if (isOwner) {
         GuildLevelUpButton(Modifier.at(8, 0))
-        GuildDisbandButton(Modifier.at(8, 5))
+        GuildDisbandButton(Modifier.at(8, 5), onNavigateToDisband)
     }
-    else GuildLeaveButton(player, Modifier.at(8, 5))
+    else GuildLeaveButton(player, Modifier.at(8, 5), onNavigateToLeave)
 
     BackButton(Modifier.at(0, 5))
 }
@@ -57,12 +61,10 @@ fun GuildUIScope.CurrentGuildInfoButton(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun GuildUIScope.GuildMemberManagement(modifier: Modifier = Modifier) {
+fun GuildMemberManagement(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Button(
         modifier = modifier,
-        onClick = {
-            nav.open(GuildScreen.MemberList(guildLevel, player))
-        }
+        onClick = onClick
     ) {
         Text("<green><b>Guild Member List".miniMsg(), modifier = Modifier.size(2, 2))
     }
@@ -150,11 +152,11 @@ fun GuildRelationshipButton(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun GuildUIScope.GuildDisbandButton(modifier: Modifier = Modifier) {
+fun GuildUIScope.GuildDisbandButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Button(
         modifier = modifier,
         enabled = (player.isGuildOwner()),
-        onClick = { nav.open(GuildScreen.Disband) }
+        onClick = onClick
     ) { enabled ->
         if (enabled)
             Text("<red><b>Disband Guild".miniMsg())
@@ -166,13 +168,11 @@ fun GuildUIScope.GuildDisbandButton(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun GuildUIScope.GuildLeaveButton(player: Player, modifier: Modifier) {
+fun GuildUIScope.GuildLeaveButton(player: Player, modifier: Modifier, onClick: () -> Unit) {
     Button(
         modifier = modifier,
         enabled = player.hasGuild() && !player.isGuildOwner(),
-        onClick = {
-            nav.open(GuildScreen.Leave)
-        }) { enabled ->
+        onClick = onClick) { enabled ->
         if (enabled)
             Text("<red><i>Leave Guild".miniMsg())
         else

@@ -23,14 +23,18 @@ import io.papermc.paper.registry.data.dialog.type.DialogType
 import net.kyori.adventure.text.event.ClickCallback
 
 @Composable
-fun GuildUIScope.GuildLookupListScreen() {
+fun GuildUIScope.GuildLookupListScreen(
+    onNavigateToMemberList: () -> Unit,
+    onNavigateToLookupMembers: (guildName: String) -> Unit,
+) {
     var pageNum by remember { mutableStateOf(0) }
     var guildPageList by remember { mutableStateOf(displayGuildList()) }
 
     Paginated(
         guildPageList, pageNum,
-        nextButton = { NextPageButton(Modifier.at(5, 0)) { pageNum++ } },
-        previousButton = { PreviousPageButton(Modifier.at(3, 0)) { pageNum-- } },
+        onPageChange = { pageNum = it },
+        nextButton = { NextPageButton(Modifier.at(5, 0)) },
+        previousButton = { PreviousPageButton(Modifier.at(3, 0)) },
         NavbarPosition.BOTTOM, null
     ) { pageItems ->
         HorizontalGrid(Modifier.at(1, 0).size(7, 5)) {
@@ -39,9 +43,9 @@ fun GuildUIScope.GuildLookupListScreen() {
                 Button(
                     onClick = {
                         if (player.hasGuild() && player.getGuildName().equals(guildName, true))
-                            nav.open(GuildScreen.MemberList(guildLevel, player))
+                            onNavigateToMemberList()
                         else
-                            nav.open(GuildScreen.GuildLookupMembers(guildName))
+                            onNavigateToLookupMembers(guildName)
 
                     }) {
                     Item(
@@ -67,21 +71,18 @@ fun GuildUIScope.GuildLookupListScreen() {
 }
 
 @Composable
-fun PreviousPageButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun PreviousPageButton(modifier: Modifier = Modifier) {
     Button(
         modifier = modifier,
-        onClick = onClick
     ) { Text("<yellow><b>Previous".miniMsg()) }
 }
 
 @Composable
 fun NextPageButton(
     modifier: Modifier,
-    onClick: () -> Unit
 ) {
     Button(
         modifier = modifier,
-        onClick = onClick
     ) { Text("<yellow><b>Next".miniMsg()) }
 }
 

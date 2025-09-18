@@ -9,6 +9,7 @@ import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
+import com.mineinabyss.guiy.navigation.LocalBackGestureDispatcher
 import com.mineinabyss.idofront.textcomponents.miniMsg
 
 @Composable
@@ -31,9 +32,12 @@ fun GuildUIScope.ConfirmButton(modifier: Modifier = Modifier) = Button(
 }
 
 @Composable
-fun GuildUIScope.CancelButton(modifier: Modifier = Modifier) = Button(
-    modifier,
-    onClick = { nav.back() }
-) {
-    Text("<red><b>Cancel Guild Disbanding".miniMsg(), modifier = Modifier.size(3, 3))
+fun CancelButton(modifier: Modifier = Modifier) {
+    val gestureDispatcher = LocalBackGestureDispatcher.current
+    Button(
+        modifier,
+        onClick = { gestureDispatcher?.onBack() }
+    ) {
+        Text("<red><b>Cancel Guild Disbanding".miniMsg(), modifier = Modifier.size(3, 3))
+    }
 }

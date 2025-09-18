@@ -29,9 +29,11 @@ fun GuildUIScope.GuildLookupMembersScreen(guildName: String) {
     val guildMembers = remember { guildName.getGuildMembers().sortedWith(compareBy { it.player.isConnected; it.player.name; it.rank.ordinal }).filter { it.rank != GuildRank.OWNER } }
 
     Scrollable(
-        guildMembers, line, ScrollDirection.VERTICAL,
-        nextButton = { ScrollDownButton(Modifier.at(0, 4).clickable { line++; this.clickType }) },
-        previousButton = { ScrollUpButton(Modifier.at(0, 1).clickable { line-- }) },
+        guildMembers, line,
+        onLineChange = { line = it },
+        ScrollDirection.VERTICAL,
+        nextButton = { ScrollDownButton(Modifier.at(0, 4)) },
+        previousButton = { ScrollUpButton(Modifier.at(0, 1)) },
         NavbarPosition.END, null
     ) { members ->
         VerticalGrid(Modifier.at(2,1).size(5, minOf(guildLevel + 1, 4))) {

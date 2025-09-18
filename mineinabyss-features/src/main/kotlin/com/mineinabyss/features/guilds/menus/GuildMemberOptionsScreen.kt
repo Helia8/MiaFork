@@ -16,39 +16,48 @@ import com.mineinabyss.idofront.textcomponents.miniMsg
 import org.bukkit.OfflinePlayer
 
 @Composable
-fun GuildUIScope.GuildMemberOptionsScreen(member: OfflinePlayer) {
-    Row(modifier = Modifier.at(0,1)) {
-        ChangeMemberRankButton(member, GuildRank.STEWARD, Modifier.size(2,2))
+fun GuildUIScope.GuildMemberOptionsScreen(
+    member: OfflinePlayer,
+    onBack: () -> Unit,
+) {
+    Row(modifier = Modifier.at(0, 1)) {
+        ChangeMemberRankButton(member, GuildRank.STEWARD, Modifier.size(2, 2), onBack)
         Spacer(1)
-        ChangeMemberRankButton(member, GuildRank.CAPTAIN, Modifier.size(3,2))
+        ChangeMemberRankButton(member, GuildRank.CAPTAIN, Modifier.size(3, 2), onBack)
         Spacer(1)
-        ChangeMemberRankButton(member, GuildRank.MEMBER, Modifier.size(2,2))
+        ChangeMemberRankButton(member, GuildRank.MEMBER, Modifier.size(2, 2), onBack)
     }
 
-    KickGuildMemberButton(member, Modifier.at(4, 4))
+    KickGuildMemberButton(member, Modifier.at(4, 4), onBack)
     BackButton(Modifier.at(0, 4))
 }
 
 @Composable
-fun GuildUIScope.ChangeMemberRankButton(member: OfflinePlayer, rank: GuildRank, modifier: Modifier = Modifier) =
+fun GuildUIScope.ChangeMemberRankButton(
+    member: OfflinePlayer, rank: GuildRank, modifier: Modifier = Modifier,
+    onBack: () -> Unit,
+) =
     Button(
         modifier = modifier,
         enabled = player.isCaptainOrAbove(),
         onClick = {
             player.setGuildRank(member, rank)
-            nav.back()
+            onBack()
         }
     ) {
         Text("<dark_aqua>Change GuildRank to <blue>$rank".miniMsg(), modifier = modifier)
     }
 
 @Composable
-fun GuildUIScope.KickGuildMemberButton(member: OfflinePlayer, modifier: Modifier = Modifier) =
+fun GuildUIScope.KickGuildMemberButton(
+    member: OfflinePlayer, modifier: Modifier = Modifier,
+    onBack: () -> Unit,
+) =
     Button(
         modifier = modifier,
         onClick = {
             player.kickPlayerFromGuild(member)
-            nav.back()
+            onBack()
         }
     ) {
         Text("<red><i>Kick Member".miniMsg())

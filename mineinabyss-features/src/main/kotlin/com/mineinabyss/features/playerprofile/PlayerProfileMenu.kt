@@ -17,7 +17,7 @@ import com.mineinabyss.geary.serialization.getOrSetPersisting
 import com.mineinabyss.geary.serialization.setPersisting
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.canvases.Chest
-import com.mineinabyss.guiy.inventory.guiy
+import com.mineinabyss.guiy.canvas.guiy
 import com.mineinabyss.guiy.layout.Column
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.height
@@ -86,7 +86,6 @@ fun PlayerProfile(viewer: Player, player: OfflinePlayer) {
     val rankComponent = Component.text(":survival:${DisplayRanks(player)}")
 
     Chest(
-        setOf(viewer),
         Component.textOfChildren(titleComponent, background, titleName, rankComponent),
         Modifier.height(4),
         onClose = { viewer.closeInventory() }) {

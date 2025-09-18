@@ -28,8 +28,7 @@ import org.bukkit.inventory.ItemStack
 
 @Composable
 fun PvpPrompt(player: Player) {
-    Chest(setOf(player), ":space_-8::pvp_menu_toggle:", Modifier.height(4),
-        onClose = { reopen() }) {
+    Chest(":space_-8::pvp_menu_toggle:", Modifier.height(4), onClose = {}) {
         EnablePvp(player, Modifier.at(1, 1))
         DisablePvp(player, Modifier.at(5, 1))
         TogglePvpPrompt(player, Modifier.at(8, 3))
