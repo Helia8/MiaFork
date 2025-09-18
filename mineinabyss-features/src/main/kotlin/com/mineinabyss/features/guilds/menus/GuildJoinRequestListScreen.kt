@@ -12,7 +12,9 @@ import com.mineinabyss.features.helpers.TitleItem
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.guiy.components.HorizontalGrid
 import com.mineinabyss.guiy.components.Item
+import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.idofront.textcomponents.miniMsg
@@ -25,7 +27,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 fun GuildUIScope.GuildJoinRequestListScreen(
     onNavigateToJoinRequest: (newMember: OfflinePlayer) -> Unit,
     onBack: () -> Unit,
-) {
+) = Chest(":space_-8::guild_inbox_list_menu:", Modifier.height(5)) {
     GuildJoinRequestButton(Modifier.at(1, 1), onNavigateToJoinRequest)
     DeclineAllGuildRequestsButton(Modifier.at(8, 4), onBack)
     BackButton(Modifier.at(2, 4))

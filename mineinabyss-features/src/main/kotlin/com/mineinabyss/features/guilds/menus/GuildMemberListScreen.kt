@@ -3,16 +3,19 @@ package com.mineinabyss.features.guilds.menus
 import androidx.compose.runtime.*
 import com.mineinabyss.features.guilds.database.GuildJoinType
 import com.mineinabyss.features.guilds.extensions.*
+import com.mineinabyss.features.guilds.menus.DecideMenus.decideMemberMenu
 import com.mineinabyss.features.helpers.Text
 import com.mineinabyss.features.helpers.TitleItem
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.VerticalGrid
+import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.components.canvases.MAX_CHEST_HEIGHT
 import com.mineinabyss.guiy.components.lists.NavbarPosition
 import com.mineinabyss.guiy.components.lists.ScrollDirection
 import com.mineinabyss.guiy.components.lists.Scrollable
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.idofront.messaging.error
@@ -29,8 +32,8 @@ import org.bukkit.inventory.ItemStack
 @Composable
 fun GuildUIScope.GuildMemberListScreen(
     onNavigateToMemberOptions: (member: OfflinePlayer) -> Unit,
-    onNavigateToJoinRequests: () -> Unit
-) {
+    onNavigateToJoinRequests: () -> Unit,
+) = Chest(":space_-8:${decideMemberMenu(player, player.getGuildJoinType())}", Modifier.height((guildLevel + 2).coerceAtMost(MAX_CHEST_HEIGHT))) {
     var line by remember { mutableStateOf(0) }
     val guildMembers = remember { player.getGuildMembers().sortedWith(compareBy { it.player.isConnected; it.player.name; it.rank.ordinal }) }
 
@@ -118,7 +121,7 @@ fun GuildUIScope.InviteToGuildButton(modifier: Modifier) {
 @Composable
 private fun GuildUIScope.ManageGuildJoinRequestsButton(
     modifier: Modifier,
-    onNavigateToJoinRequests: () -> Unit
+    onNavigateToJoinRequests: () -> Unit,
 ) {
     val requestAmount = player.getNumberOfGuildRequests()
     val plural = requestAmount != 1

@@ -12,11 +12,11 @@ import com.mineinabyss.guiy.navigation.*
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import org.bukkit.entity.Player
 
-sealed class ShopScreen(val title: String, val height: Int) {
-    class Default(shopKeeper: ShopKeeper) : ShopScreen(shopKeeper.menu, 6)
-    class Sell(shopKeeper: ShopKeeper) : ShopScreen(shopKeeper.menu, 6)
-    class Buy(shopKeeper: ShopKeeper) : ShopScreen(shopKeeper.menu, 6)
-    class Special(shopKeeper: ShopKeeper) : ShopScreen(shopKeeper.menu, 6)
+sealed class ShopScreen() {
+    class Default() : ShopScreen()
+    class Sell() : ShopScreen()
+    class Buy() : ShopScreen()
+    class Special() : ShopScreen()
 }
 
 class ShopUIScope(
@@ -62,13 +62,12 @@ fun ShopMainMenu(player: Player, shopKeeper: ShopKeeper) {
     scope.apply {
         val nav = rememberNavController()
         BackHandler { nav.popBackStack() }
-        //TODO each screen needs to create their own Chest instance now.
-        NavHost(nav, startDestination = ShopScreen.Default(shopKeeper)) {
+        NavHost(nav, startDestination = ShopScreen.Default()) {
             composable<ShopScreen.Default> {
                 ShopHomeScreen(
-                    onNavigateToSpecial = { nav.navigate(ShopScreen.Special(shopKeeper)) },
-                    onNavigateToBuyScreen = { nav.navigate(ShopScreen.Buy(shopKeeper)) },
-                    onNavigateToSellScreen = { nav.navigate(ShopScreen.Sell(shopKeeper)) },
+                    onNavigateToSpecial = { nav.navigate(ShopScreen.Special()) },
+                    onNavigateToBuyScreen = { nav.navigate(ShopScreen.Buy()) },
+                    onNavigateToSellScreen = { nav.navigate(ShopScreen.Sell()) },
                 )
             }
             composable<ShopScreen.Sell> { ShopSellMenu() }

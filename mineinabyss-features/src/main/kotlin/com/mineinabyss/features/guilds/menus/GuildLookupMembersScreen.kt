@@ -9,19 +9,20 @@ import com.mineinabyss.features.helpers.TitleItem
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.VerticalGrid
+import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.components.canvases.MAX_CHEST_HEIGHT
 import com.mineinabyss.guiy.components.lists.NavbarPosition
 import com.mineinabyss.guiy.components.lists.ScrollDirection
 import com.mineinabyss.guiy.components.lists.Scrollable
 import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.click.clickable
+import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import org.bukkit.OfflinePlayer
 
 @Composable
-fun GuildUIScope.GuildLookupMembersScreen(guildName: String) {
+fun GuildUIScope.GuildLookupMembersScreen(guildName: String) = Chest(":space_-8:${":guild_lookup_members${minOf(guildName.getGuildLevel(), 3)}"}:", Modifier.height((guildName.getGuildLevel() + 3).coerceAtMost(MAX_CHEST_HEIGHT))) {
     val owner = guildName.getOwnerFromGuildName()
     val guildLevel = owner.getGuildLevel()
     val height = minOf(guildLevel.plus(2), MAX_CHEST_HEIGHT - 1)
@@ -36,7 +37,7 @@ fun GuildUIScope.GuildLookupMembersScreen(guildName: String) {
         previousButton = { ScrollUpButton(Modifier.at(0, 1)) },
         NavbarPosition.END, null
     ) { members ->
-        VerticalGrid(Modifier.at(2,1).size(5, minOf(guildLevel + 1, 4))) {
+        VerticalGrid(Modifier.at(2, 1).size(5, minOf(guildLevel + 1, 4))) {
             members.forEach { (rank, member) ->
                 Button {
                     Item(

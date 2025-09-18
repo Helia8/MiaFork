@@ -4,9 +4,11 @@ import androidx.compose.runtime.Composable
 import com.mineinabyss.features.helpers.Text
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.guiy.components.Spacer
+import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.components.canvases.MAX_CHEST_HEIGHT
 import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.idofront.textcomponents.miniMsg
@@ -16,7 +18,7 @@ fun ShopUIScope.ShopHomeScreen(
     onNavigateToSpecial: () -> Unit,
     onNavigateToBuyScreen: () -> Unit,
     onNavigateToSellScreen: () -> Unit,
-) {
+) = Chest(shopKeeper.menu, Modifier.height(6)) {
     Row(Modifier.at(1, 1)) {
         OpenSellMenu(onNavigateToSellScreen = onNavigateToSellScreen)
         Spacer(1)

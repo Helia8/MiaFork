@@ -6,9 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.mineinabyss.features.guilds.database.GuildJoinType
 import com.mineinabyss.features.guilds.extensions.*
-import com.mineinabyss.features.guilds.menus.DecideMenus.decideInfoMenu
 import com.mineinabyss.features.guilds.menus.DecideMenus.decideMainMenu
-import com.mineinabyss.features.guilds.menus.DecideMenus.decideMemberMenu
 import com.mineinabyss.features.guilds.menus.GuildScreen.*
 import com.mineinabyss.features.guilds.menus.GuildScreen.Invite
 import com.mineinabyss.features.helpers.Text
@@ -18,10 +16,11 @@ import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.guiy.canvas.GuiyOwner
 import com.mineinabyss.guiy.canvas.LocalGuiyOwner
 import com.mineinabyss.guiy.components.Spacer
-import com.mineinabyss.guiy.components.canvases.MAX_CHEST_HEIGHT
+import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.layout.Column
 import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.guiy.navigation.*
@@ -32,30 +31,27 @@ import io.papermc.paper.registry.data.dialog.input.DialogInput
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 
-sealed class GuildScreen(var title: String, val height: Int) {
-    class Default(player: Player) : GuildScreen(title = ":space_-8:${decideMainMenu(player)}", height = 4)
+sealed class GuildScreen() {
+    class Default() : GuildScreen()
 
-    class GuildInfo(isGuildOwner: Boolean) : GuildScreen(":space_-8:${decideInfoMenu(isGuildOwner)}", 6)
+    class GuildInfo() : GuildScreen()
 
-    data object Leave : GuildScreen(":space_-8::guild_disband_or_leave_menu:", 5)
-    data object Disband : GuildScreen(":space_-8::guild_disband_or_leave_menu:", 5)
+    data object Leave : GuildScreen()
+    data object Disband : GuildScreen()
 
-    data object GuildList : GuildScreen(":space_-8::guild_list_menu:", 6)
-    class GuildLookupMembers(val guildName: GuildName) :
-        GuildScreen(":space_-8:${":guild_lookup_members${minOf(guildName.getGuildLevel(), 3)}"}:", minOf(guildName.getGuildLevel() + 3, MAX_CHEST_HEIGHT))
+    data object GuildList : GuildScreen()
+    class GuildLookupMembers(val guildName: GuildName) : GuildScreen()
 
     // Forgot to add to pack so this is fine for now
-    data object InviteList : GuildScreen(":space_-8::guild_inbox_list_menu:", 5)
-    class Invite(val owner: OfflinePlayer) : GuildScreen(":space_-8::guild_inbox_handle_menu:", 5)
+    data object InviteList : GuildScreen()
+    class Invite(val owner: OfflinePlayer) : GuildScreen()
 
-    data object JoinRequestList : GuildScreen(":space_-8::guild_inbox_list_menu:", 5)
-    class JoinRequest(val from: OfflinePlayer) : GuildScreen(":space_-8::guild_inbox_handle_menu:", 5)
+    data object JoinRequestList : GuildScreen()
+    class JoinRequest(val from: OfflinePlayer) : GuildScreen()
 
-    class MemberOptions(val member: OfflinePlayer) :
-        GuildScreen(":space_-8::guild_member_action_menu:", 5)
+    class MemberOptions(val member: OfflinePlayer) : GuildScreen()
 
-    class MemberList(val guildLevel: Int, player: Player) :
-        GuildScreen(":space_-8:${decideMemberMenu(player, player.getGuildJoinType())}", minOf(guildLevel + 2, MAX_CHEST_HEIGHT))
+    class MemberList() : GuildScreen()
 }
 
 class GuildUIScope(
@@ -77,15 +73,15 @@ fun GuildMainMenu(player: Player, openedFromHQ: Boolean = false) {
     scope.apply {
         val nav = rememberNavController()
         BackHandler { nav.popBackStack() }
-        NavHost<GuildScreen>(nav, startDestination = Default(player)) {
+        NavHost<GuildScreen>(nav, startDestination = Default()) {
             composable<Default> {
                 HomeScreen(
                     openedFromHQ,
-                    onNavigateToInfo = { nav.navigate(GuildInfo(player.isGuildOwner())) },
+                    onNavigateToInfo = { nav.navigate(GuildInfo()) },
                     onNavigateToGuildList = { nav.navigate(GuildList) },
                     onNavigateToDefault = {
                         nav.reset()
-                        nav.navigate(Default(player))
+                        nav.navigate(Default())
                     },
                     onNavigateToInviteList = { nav.navigate(InviteList) },
                     onBack = { nav.popBackStack() },
@@ -93,7 +89,7 @@ fun GuildMainMenu(player: Player, openedFromHQ: Boolean = false) {
             }
             composable<GuildInfo> {
                 GuildInfoScreen(
-                    onNavigateToMemberList = { nav.navigate(MemberList(guildLevel, player)) },
+                    onNavigateToMemberList = { nav.navigate(MemberList()) },
                     onNavigateToDisband = { nav.navigate(Disband) },
                     onNavigateToLeave = { nav.navigate(Leave) },
                 )
@@ -101,7 +97,7 @@ fun GuildMainMenu(player: Player, openedFromHQ: Boolean = false) {
             composable<Leave> { GuildLeaveScreen() }
             composable<GuildList> {
                 GuildLookupListScreen(
-                    onNavigateToMemberList = { nav.navigate(MemberList(guildLevel, player)) },
+                    onNavigateToMemberList = { nav.navigate(MemberList()) },
                     onNavigateToLookupMembers = { nav.navigate(GuildLookupMembers(it)) }
                 )
             }
@@ -109,7 +105,7 @@ fun GuildMainMenu(player: Player, openedFromHQ: Boolean = false) {
             composable<InviteList> {
                 GuildInviteListScreen(
                     onNavigateToInviteScreen = { nav.navigate(Invite(it)) },
-                    onNavigateToMemberList = { nav.navigate(MemberList(guildLevel, player)) }
+                    onNavigateToMemberList = { nav.navigate(MemberList()) }
                 )
             }
             composable<Invite> { screen ->
@@ -146,7 +142,7 @@ fun GuildUIScope.HomeScreen(
     onNavigateToInviteList: () -> Unit,
     onNavigateToDefault: () -> Unit,
     onBack: () -> Unit,
-) {
+) = Chest(":space_-8:${decideMainMenu(player)}", Modifier.height(4)) {
     val guildOwner by remember { mutableStateOf(player.isGuildOwner()) }
     Row(Modifier.at(2, 1)) {
         if (player.hasGuild()) CurrentGuildButton(onClick = onNavigateToInfo)

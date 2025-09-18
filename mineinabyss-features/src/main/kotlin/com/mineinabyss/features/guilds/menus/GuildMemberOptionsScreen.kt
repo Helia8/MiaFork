@@ -8,8 +8,10 @@ import com.mineinabyss.features.guilds.extensions.setGuildRank
 import com.mineinabyss.features.helpers.Text
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.guiy.components.Spacer
+import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.idofront.textcomponents.miniMsg
@@ -19,7 +21,7 @@ import org.bukkit.OfflinePlayer
 fun GuildUIScope.GuildMemberOptionsScreen(
     member: OfflinePlayer,
     onBack: () -> Unit,
-) {
+) = Chest(":space_-8::guild_member_action_menu:", Modifier.height(5)) {
     Row(modifier = Modifier.at(0, 1)) {
         ChangeMemberRankButton(member, GuildRank.STEWARD, Modifier.size(2, 2), onBack)
         Spacer(1)

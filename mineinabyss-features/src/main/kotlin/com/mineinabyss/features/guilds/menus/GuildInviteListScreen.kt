@@ -10,7 +10,9 @@ import com.mineinabyss.features.helpers.TitleItem
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.guiy.components.HorizontalGrid
 import com.mineinabyss.guiy.components.Item
+import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.idofront.messaging.info
@@ -24,7 +26,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 fun GuildUIScope.GuildInviteListScreen(
     onNavigateToInviteScreen: (owner: OfflinePlayer) -> Unit,
     onNavigateToMemberList: () -> Unit,
-) {
+) = Chest(":space_-8::guild_inbox_list_menu:", Modifier.height(5)) {
     GuildInvites(Modifier.at(1, 1), onNavigateToInviteScreen)
     DenyAllInvitesButton(Modifier.at(8, 4), onNavigateToMemberList)
     BackButton(Modifier.at(2, 4))

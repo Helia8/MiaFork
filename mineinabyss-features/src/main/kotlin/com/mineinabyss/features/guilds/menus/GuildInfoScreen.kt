@@ -2,13 +2,16 @@ package com.mineinabyss.features.guilds.menus
 
 import androidx.compose.runtime.Composable
 import com.mineinabyss.features.guilds.extensions.*
+import com.mineinabyss.features.guilds.menus.DecideMenus.decideInfoMenu
 import com.mineinabyss.features.helpers.Text
 import com.mineinabyss.features.helpers.di.Features
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.guiy.components.Spacer
+import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.layout.Column
 import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.idofront.textcomponents.miniMsg
@@ -20,7 +23,7 @@ fun GuildUIScope.GuildInfoScreen(
     onNavigateToMemberList: () -> Unit,
     onNavigateToDisband: () -> Unit,
     onNavigateToLeave: () -> Unit,
-) {
+) = Chest(":space_-8:${decideInfoMenu(player.isGuildOwner())}", Modifier.height(6)) {
     val isOwner = player.isGuildOwner()
     Column(Modifier.at(2, 0)) {
         Row {
@@ -40,8 +43,7 @@ fun GuildUIScope.GuildInfoScreen(
     if (isOwner) {
         GuildLevelUpButton(Modifier.at(8, 0))
         GuildDisbandButton(Modifier.at(8, 5), onNavigateToDisband)
-    }
-    else GuildLeaveButton(player, Modifier.at(8, 5), onNavigateToLeave)
+    } else GuildLeaveButton(player, Modifier.at(8, 5), onNavigateToLeave)
 
     BackButton(Modifier.at(0, 5))
 }
@@ -79,12 +81,14 @@ fun GuildUIScope.GuildRenameButton(modifier: Modifier = Modifier) {
             if (!player.isCaptainOrAbove()) return@Button
 
             val maxGuildLength = Features.guilds.config.guildNameMaxLength
-            val dialog = GuildDialogs(":space_-28::guild_name_menu:", "<gold>Rename Guild!", listOf(
-                DialogInput.text("guild_dialog", "<gold>Rename Guild...".miniMsg())
-                    .initial(guildName ?: "").width(maxGuildLength * 6)
-                    .maxLength(maxGuildLength)
-                    .build()
-            )).createGuildLookDialog { player.changeStoredGuildName(it) }
+            val dialog = GuildDialogs(
+                ":space_-28::guild_name_menu:", "<gold>Rename Guild!", listOf(
+                    DialogInput.text("guild_dialog", "<gold>Rename Guild...".miniMsg())
+                        .initial(guildName ?: "").width(maxGuildLength * 6)
+                        .maxLength(maxGuildLength)
+                        .build()
+                )
+            ).createGuildLookDialog { player.changeStoredGuildName(it) }
 
             player.showDialog(dialog)
         }
@@ -116,11 +120,13 @@ fun GuildUIScope.GuildLevelUpButton(modifier: Modifier = Modifier) {
                     "<red><b>Level up Guildrank".miniMsg(),
                     "<gold>Next level-up will cost <b>${guild?.getGuildLevelUpCost()} coins</b>.".miniMsg()
                 )
+
             isMaxLevel ->
                 Text(
                     "<red><b><st>Level up Guildrank".miniMsg(),
                     "<dark_red>Your guild has reached the current max-level.".miniMsg()
                 )
+
             else ->
                 Text(
                     "<red><b><st>Level up Guildrank".miniMsg(),
@@ -172,7 +178,8 @@ fun GuildUIScope.GuildLeaveButton(player: Player, modifier: Modifier, onClick: (
     Button(
         modifier = modifier,
         enabled = player.hasGuild() && !player.isGuildOwner(),
-        onClick = onClick) { enabled ->
+        onClick = onClick
+    ) { enabled ->
         if (enabled)
             Text("<red><i>Leave Guild".miniMsg())
         else
