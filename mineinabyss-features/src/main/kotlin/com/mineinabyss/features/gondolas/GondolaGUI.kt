@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.mineinabyss.components.gondolas.Gondola
 import com.mineinabyss.components.gondolas.UnlockedGondolas
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
+import com.mineinabyss.geary.serialization.getOrSetPersisting
 import com.mineinabyss.guiy.components.HorizontalGrid
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.canvases.Chest
@@ -20,7 +21,7 @@ import org.bukkit.entity.Player
 fun GondolaSelectionMenu(player: Player) {
     val owner = LocalGuiyOwner.current
     val gearyPlayer = player.toGeary()
-    val gondolas = gearyPlayer.get<UnlockedGondolas>() ?: return
+    val gondolas = player.toGeary().getOrSetPersisting<UnlockedGondolas> { UnlockedGondolas() }
 
     Chest(
         setOf(player),
