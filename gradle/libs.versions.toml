@@ -1,6 +1,6 @@
 [versions]
 gearyPaper = "0.33.2"
-guiy = "0.14.0-dev.0"
+guiy = "0.14.0"
 deeperworld = "0.12.0"
 chatty = "0.9.0"
 packy = "0.8.7"

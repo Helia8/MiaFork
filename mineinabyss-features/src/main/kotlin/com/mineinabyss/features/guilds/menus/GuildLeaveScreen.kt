@@ -41,7 +41,7 @@ fun GuildUIScope.DontLeaveButton(modifier: Modifier = Modifier) {
     val dispatcher = LocalBackGestureDispatcher.current
     Button(
         modifier,
-        onClick = { dispatcher?.onBack() }
+        onClick = { dispatcher.onBack() }
     ) {
         Text(
             "<red><b>Don't Leave <dark_red><i>${guildName}".miniMsg(),

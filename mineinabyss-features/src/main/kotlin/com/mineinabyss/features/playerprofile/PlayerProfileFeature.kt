@@ -28,11 +28,11 @@ class PlayerProfileFeature(val config: Config) : Feature() {
         mainCommand {
             "profile"(desc = "Opens a players profile") {
                 playerAction {
-                    guiy { PlayerProfile(sender as Player, player) }
+                    guiy(player) { PlayerProfile(sender as Player, player) }
                 }
                 val offlinePlayer by offlinePlayerArg { default = sender as? Player }
                 action {
-                    guiy { PlayerProfile(sender as Player, offlinePlayer) }
+                    guiy(sender as Player) { PlayerProfile(sender as Player, offlinePlayer) }
                 }
             }
             "profile_background"(desc = "Changes the background for your Player-Profile") {

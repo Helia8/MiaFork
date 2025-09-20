@@ -7,6 +7,7 @@ import com.mineinabyss.features.helpers.TitleItem
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.features.pvp.ToggleIcon.disabled
 import com.mineinabyss.features.pvp.ToggleIcon.enabled
+import com.mineinabyss.guiy.canvas.LocalGuiyOwner
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.modifiers.Modifier
@@ -37,6 +38,7 @@ fun PvpPrompt(player: Player) {
 
 @Composable
 fun EnablePvp(player: Player, modifier: Modifier) {
+    val owner = LocalGuiyOwner.current
     Item(
         TitleItem.of(
             "<dark_green><b>Enable PvP".miniMsg(),
@@ -50,7 +52,7 @@ fun EnablePvp(player: Player, modifier: Modifier) {
             }
             player.success("PvP has been enabled!")
             player.playSound(player.location, Sound.ITEM_ARMOR_EQUIP_GENERIC, 1f, 1f)
-            player.closeInventory()
+            owner.exit()
         }
     )
 }

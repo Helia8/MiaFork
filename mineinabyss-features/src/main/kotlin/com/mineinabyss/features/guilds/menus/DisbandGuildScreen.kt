@@ -35,10 +35,10 @@ fun GuildUIScope.ConfirmButton(modifier: Modifier = Modifier) = Button(
 
 @Composable
 fun CancelButton(modifier: Modifier = Modifier) {
-    val gestureDispatcher = LocalBackGestureDispatcher.current
+    val dispatcher = LocalBackGestureDispatcher.current
     Button(
         modifier,
-        onClick = { gestureDispatcher?.onBack() }
+        onClick = { dispatcher.onBack() }
     ) {
         Text("<red><b>Cancel Guild Disbanding".miniMsg(), modifier = Modifier.size(3, 3))
     }

@@ -13,7 +13,7 @@ class ShopKeepingListener : Listener {
     @EventHandler
     fun PlayerInteractEntityEvent.onInteractShopKeeper() {
         val shopkeeper = rightClicked.toGearyOrNull()?.get<ShopKeeper>() ?: return
-        guiy {
+        guiy(player) {
             ShopMainMenu(player, shopkeeper)
             player.playSound(player, Sound.ENTITY_VILLAGER_TRADE, 1f, 1f)
         }

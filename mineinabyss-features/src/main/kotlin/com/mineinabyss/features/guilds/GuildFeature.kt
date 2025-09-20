@@ -139,7 +139,7 @@ class GuildFeature : FeatureWithContext<GuildFeature.Context>(::Context) {
                 }
                 "menu"(desc = "Open Guild Menu") {
                     playerAction {
-                        guiy { GuildMainMenu(player, true) }
+                        guiy(player) { GuildMainMenu(player, true) }
                     }
                 }
                 "admin" {

@@ -87,8 +87,8 @@ fun PlayerProfile(viewer: Player, player: OfflinePlayer) {
 
     Chest(
         Component.textOfChildren(titleComponent, background, titleName, rankComponent),
-        Modifier.height(4),
-        onClose = { viewer.closeInventory() }) {
+        Modifier.height(4)
+    ) {
         PlayerHead(player, Modifier.at(0, 1))
         if (player == viewer) ToggleArmorVisibility(onClick = {
             if (player == viewer) {
@@ -194,6 +194,7 @@ fun MittyTokenBalance(player: OfflinePlayer) {
 @Composable
 fun GuildButton(player: OfflinePlayer, viewer: Player) {
     Button(enabled = player.hasGuild() && !viewer.hasGuild(), onClick = {
+        //TODO suspicious call, this seems to od nothing?
         guiy { player.getGuildName()?.let { GuildScreen.GuildLookupMembers(it) } }
     }) {
         if (player.hasGuild()) Text(

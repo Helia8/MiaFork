@@ -29,14 +29,14 @@ class ShopUIScope(
 @Composable
 fun BackButton(modifier: Modifier = Modifier) {
     val dispatcher = LocalBackGestureDispatcher.current
-    Button(onClick = { dispatcher?.onBack() }, modifier = modifier) {
+    Button(onClick = { dispatcher.onBack() }, modifier = modifier) {
         Text("<red><b>Back".miniMsg())
     }
 }
 
 @Composable
 fun ShopUIScope.CloseButton(modifier: Modifier = Modifier) {
-    Button(onClick = { player.closeInventory() }, modifier = modifier) {
+    Button(onClick = { owner.exit() }, modifier = modifier) {
         Text("<red><b>Close".miniMsg())
     }
 }
@@ -61,7 +61,6 @@ fun ShopMainMenu(player: Player, shopKeeper: ShopKeeper) {
     val scope = remember { ShopUIScope(player, owner, shopKeeper) }
     scope.apply {
         val nav = rememberNavController()
-        BackHandler { nav.popBackStack() }
         NavHost(nav, startDestination = ShopScreen.Default()) {
             composable<ShopScreen.Default> {
                 ShopHomeScreen(

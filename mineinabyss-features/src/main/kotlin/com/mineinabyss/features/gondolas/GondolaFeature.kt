@@ -43,7 +43,7 @@ class GondolaFeature : FeatureWithContext<GondolaFeature.Context>(::Context) {
                 "list"(desc = "Opens the gondola menu") {
                     permission = "mineinabyss.gondola.list"
                     playerAction {
-                        guiy { GondolaSelectionMenu(player) }
+                        guiy(player) { GondolaSelectionMenu(player) }
                     }
                 }
                 "unlock"(desc = "Unlocks a route for a player") {

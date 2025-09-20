@@ -25,7 +25,7 @@ class ShopKeepingFeature : Feature() {
                 playerAction {
                     player.withGeary {
                         val shopKeeper = PrefabKey.of(shopKey).toEntityOrNull()?.get<ShopKeeper>() ?: return@playerAction
-                        guiy { ShopMainMenu(player, shopKeeper) }
+                        guiy(player) { ShopMainMenu(player, shopKeeper) }
                     }
                 }
             }

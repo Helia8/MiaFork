@@ -24,7 +24,7 @@ class PvpFeature : Feature() {
                         player.error("Pvp cannot be toggled in this layer.")
                         return@playerAction
                     }
-                    guiy { PvpPrompt(player) }
+                    guiy(player) { PvpPrompt(player) }
                 }
             }
         }

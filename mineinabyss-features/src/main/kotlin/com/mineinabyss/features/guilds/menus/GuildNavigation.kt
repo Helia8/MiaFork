@@ -72,7 +72,6 @@ fun GuildMainMenu(player: Player, openedFromHQ: Boolean = false) {
     val scope = remember { GuildUIScope(player, owner) }
     scope.apply {
         val nav = rememberNavController()
-        BackHandler { nav.popBackStack() }
         NavHost<GuildScreen>(nav, startDestination = Default()) {
             composable<Default> {
                 HomeScreen(
@@ -164,14 +163,14 @@ fun GuildUIScope.HomeScreen(
 @Composable
 fun GuildUIScope.BackButton(modifier: Modifier = Modifier) {
     val dispatcher = LocalBackGestureDispatcher.current
-    Button(onClick = { dispatcher?.onBack() }, modifier = modifier) {
+    Button(onClick = { dispatcher.onBack() }, modifier = modifier) {
         Text("<red><b>Back".miniMsg())
     }
 }
 
 @Composable
 fun GuildUIScope.CloseButton(modifier: Modifier = Modifier) {
-    Button(onClick = { player.closeInventory() }, modifier = modifier) {
+    Button(onClick = { owner.exit() }, modifier = modifier) {
         Text("<red><b>Close".miniMsg())
     }
 }
