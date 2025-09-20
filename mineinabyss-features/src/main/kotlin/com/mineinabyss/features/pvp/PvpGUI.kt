@@ -59,6 +59,7 @@ fun EnablePvp(player: Player, modifier: Modifier) {
 
 @Composable
 fun DisablePvp(player: Player, modifier: Modifier) {
+    val owner = LocalGuiyOwner.current
     Item(
         TitleItem.of(
             "<dark_red><b>Disable PvP".miniMsg(),
@@ -72,7 +73,7 @@ fun DisablePvp(player: Player, modifier: Modifier) {
             }
             player.error("PvP has been disabled!")
             player.playSound(player.location, Sound.ITEM_ARMOR_EQUIP_GENERIC, 1f, 0.1f)
-            player.closeInventory()
+            owner.exit()
         }
     )
 }

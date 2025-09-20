@@ -212,7 +212,7 @@ fun GuildUIScope.CreateGuildButton(
                 !openedFromHQ -> {
                     player.error("You need to register your guild")
                     player.error("with the Guild Master at Orth GuildHQ.")
-                    player.closeInventory()
+                    owner.exit()
                 }
 
                 else -> {

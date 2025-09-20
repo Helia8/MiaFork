@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.mineinabyss.features.helpers.Text
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.features.orthbanking.depositCoins
+import com.mineinabyss.guiy.canvas.LocalGuiyOwner
 import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.height
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player
 @Composable
 fun DepositScreen(player: Player) = Chest(":space_-8::orthbanker_deposit_menu:", Modifier.height(5)) {
     var amount = 1
+    val owner = LocalGuiyOwner.current
 
     Button(
         Modifier.at(3, 0),
@@ -30,7 +32,7 @@ fun DepositScreen(player: Player) = Chest(":space_-8::orthbanker_deposit_menu:",
         Modifier.at(4, 2),
         onClick = {
             player.depositCoins(amount)
-            player.closeInventory()
+            owner.exit()
         }
     ) {
         Text("<gold><b>Confirm Deposit".miniMsg())

@@ -28,7 +28,7 @@ fun GuildUIScope.ConfirmButton(modifier: Modifier = Modifier) = Button(
     modifier,
     onClick = {
         player.deleteGuild()
-        player.closeInventory()
+        owner.exit()
     }) {
     Text("<green><b>Confirm Guild Disbanding".miniMsg(), modifier = Modifier.size(3, 3))
 }

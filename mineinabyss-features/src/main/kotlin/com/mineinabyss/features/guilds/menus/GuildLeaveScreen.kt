@@ -28,7 +28,7 @@ fun GuildUIScope.LeaveButton(modifier: Modifier = Modifier) = Button(
     modifier,
     onClick = {
         player.leaveGuild()
-        player.closeInventory()
+        owner.exit()
     }) {
     Text(
         "<green><b>Leave <dark_green><i>${guildName}".miniMsg(),
