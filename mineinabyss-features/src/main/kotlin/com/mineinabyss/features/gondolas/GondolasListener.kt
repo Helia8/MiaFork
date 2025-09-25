@@ -91,11 +91,6 @@ class GondolasListener : Listener {
                 playerZoneEntry.remove(player.uniqueId)
                 justWarped.add(player.uniqueId)
             }
-
-            else -> {
-                val remainingSeconds = (data.gondola.warpCooldown - (now - entry.second)) / 1000
-                player.sendActionBar("Warping in $remainingSeconds seconds...")
-            }
         }
     }
 }
