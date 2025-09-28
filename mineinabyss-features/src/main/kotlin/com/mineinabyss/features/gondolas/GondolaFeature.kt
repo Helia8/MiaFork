@@ -44,6 +44,7 @@ class GondolaFeature : FeatureWithContext<GondolaFeature.Context>(::Context) {
         //LoadedGondolas
         //createGondolaTracker()
         plugin.listeners(context.gondolasListener)
+        context.gondolasListener.startCooldownDisplayTask(plugin)
         mainCommand {
             "gondola"(desc = "Commands for gondolas") {
                 permission = "mineinabyss.gondola"
