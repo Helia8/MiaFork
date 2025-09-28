@@ -77,7 +77,8 @@ class GondolasListener : Listener {
     private fun handleWarpCooldown(
         player: Player,
         data: GondolaData,
-        now: Long
+        now: Long,
+        
     ) {
         val entry = playerZoneEntry[player.uniqueId]
 
@@ -87,7 +88,7 @@ class GondolasListener : Listener {
             }
 
             now - entry.second >= data.gondola.warpCooldown -> {
-                gondolaWarp(data.gondola, player, data.type)
+                gondolaWarp(data.gondola, player, data.type, gondolaId, ticketConfig)
                 playerZoneEntry.remove(player.uniqueId)
                 justWarped.add(player.uniqueId)
             }

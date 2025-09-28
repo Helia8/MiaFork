@@ -14,3 +14,12 @@ fun Player.unlockRoute(ticket: Ticket) {
     }
     this.success("Unlocked route of: ${ticket.ticketName}")
 }
+
+fun Player.removeRoute(gondolaId: String, ticketConfig: TicketConfig) {
+    val unlocked =  this.toGeary().getOrSetPersisting<UnlockedGondolas> { UnlockedGondolas() }
+    val ticket = ticketConfig.tickets.values.firstOrNull { gondolaId in it.gondolasInRoute && it.consumeWhenUsed} ?: return
+    for (gondolasId in ticket.gondolasInRoute) {
+        unlocked.keys.remove(gondolasId)
+    }
+    this.success("Removed route of: ${ticket.ticketName}")
+}
