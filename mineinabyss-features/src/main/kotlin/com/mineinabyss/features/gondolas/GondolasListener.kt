@@ -10,11 +10,13 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerMoveEvent
 import java.util.UUID
 import com.mineinabyss.idofront.textcomponents.miniMsg
+import net.kyori.adventure.sound.Sound
 import org.bukkit.plugin.java.JavaPlugin
 import kotlin.collections.remove
 import kotlin.compareTo
 import kotlin.div
 import kotlin.text.get
+import net.kyori.adventure.key.Key
 
 class GondolasListener : Listener {
     private val playerZoneEntry = mutableMapOf<UUID, Pair<String, Long>>()
@@ -59,6 +61,11 @@ class GondolasListener : Listener {
                 val player = plugin.server.getPlayer(uuid) ?: continue
                 val gondolaData = LoadedGondolas.loaded[entry.first] ?: continue
                 val remaining = gondolaData.warpCooldown - (now - entry.second)
+                if (remaining == gondolaData.warpCooldown) {
+                    player.playSound(
+                        Sound.sound(Key.key("minecraft:ambient.cave.cave_18"), Sound.Source.AMBIENT, 1f, 1f)
+                    )
+                }
                 if (remaining > 0) {
                     val seconds = remaining / 1000
                     player.sendActionBar("Warping in $seconds seconds...")
@@ -70,7 +77,8 @@ class GondolasListener : Listener {
     private fun handleWarpCooldown(
         player: Player,
         data: GondolaData,
-        now: Long
+        now: Long,
+        
     ) {
         val entry = playerZoneEntry[player.uniqueId]
 
@@ -80,14 +88,9 @@ class GondolasListener : Listener {
             }
 
             now - entry.second >= data.gondola.warpCooldown -> {
-                gondolaWarp(data.gondola, player, data.type)
+                gondolaWarp(data.gondola, player, data.type, gondolaId, ticketConfig)
                 playerZoneEntry.remove(player.uniqueId)
                 justWarped.add(player.uniqueId)
-            }
-
-            else -> {
-                val remainingSeconds = (data.gondola.warpCooldown - (now - entry.second)) / 1000
-                player.sendActionBar("Warping in $remainingSeconds seconds...")
             }
         }
     }

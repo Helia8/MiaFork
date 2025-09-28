@@ -22,7 +22,8 @@ class Gondola(
     val warpZoneRange: Double, // the range in which the player needs to stay in order to be teleported
     @SerialName("no_access_message")
     private val _noAccessMessage: String, // the message to display when the player tries to use the gondola without perms
-    val warpCooldown: Long = 5000
+    val warpCooldown: Long = 5000,
+    val consumeTicket: Boolean = false,
 ) {
     @Transient
     val parsedNoAccessMessage: Component get() = _noAccessMessage.miniMsg()
