@@ -13,12 +13,12 @@ enum class GondolaType() {
     NONE;
 }
 
-fun gondolaWarp(gondola: Gondola, player: Player, gondolaType: GondolaType, gondolaId: String? = null, ticketConfig: TicketConfig) {
+fun gondolaWarp(gondola: Gondola, player: Player, gondolaType: GondolaType, gondolaId: String? = null) {
     val loc =
         if (gondolaType == GondolaType.LOWER) gondola.upperLoc else gondola.lowerLoc
     player.teleportAsync(loc)
     if (gondola.consumeTicket && (gondolaId != null)) {
-        player.removeRoute(gondolaId, ticketConfig)
+        player.removeRoute(gondolaId)
     }
 }
 

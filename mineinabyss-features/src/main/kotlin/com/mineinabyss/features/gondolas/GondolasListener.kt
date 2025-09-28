@@ -2,6 +2,7 @@ package com.mineinabyss.features.gondolas
 
 import com.mineinabyss.components.gondolas.Gondola
 import com.mineinabyss.components.gondolas.UnlockedGondolas
+import com.mineinabyss.features.gondolas.pass.TicketConfig
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.idofront.messaging.error
 import org.bukkit.entity.Player
@@ -43,7 +44,7 @@ class GondolasListener : Listener {
         if (nearbyGondolaData.id !in unlockedGondolas.keys) return showError(player, nearbyGondolaData.gondola, now)
 
         if (player.uniqueId in justWarped) return
-        handleWarpCooldown(player, nearbyGondolaData, now)
+        handleWarpCooldown(player, nearbyGondolaData, now, nearbyGondolaData.id)
     }
 
     private fun showError(player: Player, gondola: Gondola, now: Long) {
@@ -78,7 +79,7 @@ class GondolasListener : Listener {
         player: Player,
         data: GondolaData,
         now: Long,
-        
+        gondolaId: String? = null,
     ) {
         val entry = playerZoneEntry[player.uniqueId]
 
@@ -88,7 +89,7 @@ class GondolasListener : Listener {
             }
 
             now - entry.second >= data.gondola.warpCooldown -> {
-                gondolaWarp(data.gondola, player, data.type, gondolaId, ticketConfig)
+                gondolaWarp(data.gondola, player, data.type, gondolaId)
                 playerZoneEntry.remove(player.uniqueId)
                 justWarped.add(player.uniqueId)
             }
