@@ -18,6 +18,7 @@ import kotlin.compareTo
 import kotlin.div
 import kotlin.text.get
 import net.kyori.adventure.key.Key
+import org.bukkit.Location
 
 class GondolasListener : Listener {
     private val playerZoneEntry = mutableMapOf<UUID, Pair<String, Long>>()
@@ -25,10 +26,7 @@ class GondolasListener : Listener {
     private val lastErrorTime = mutableMapOf<UUID, Long>()
     private val errorCooldown = 5000
 
-    @EventHandler
-    fun PlayerMoveEvent.onPlayerMove() {
-        if (!hasExplicitlyChangedBlock()) return
-
+    private fun handleGondola(player: Player) {
         val gondolas = LoadedGondolas.loaded
         val now = System.currentTimeMillis()
 
@@ -45,6 +43,11 @@ class GondolasListener : Listener {
 
         if (player.uniqueId in justWarped) return
         handleWarpCooldown(player, nearbyGondolaData, now, nearbyGondolaData.id)
+    }
+    @EventHandler
+    fun PlayerMoveEvent.onPlayerMove() {
+        if (!hasExplicitlyChangedBlock()) return
+        handleGondola(player)
     }
 
     private fun showError(player: Player, gondola: Gondola, now: Long) {
@@ -70,6 +73,8 @@ class GondolasListener : Listener {
                 if (remaining > 0) {
                     val seconds = remaining / 1000
                     player.sendActionBar("Warping in $seconds seconds...")
+                } else {
+                    handleGondola(player)
                 }
             }
         }, 1L, 1L)
