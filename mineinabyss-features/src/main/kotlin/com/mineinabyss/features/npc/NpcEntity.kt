@@ -23,6 +23,22 @@ class NpcEntity(
 ) {
 
 
+
+    fun createBaseNpc() {
+        val location = config.location
+        val chunk = location.chunk
+        // delete the old entity if it exists and respawn a newer version instead
+        // note: we can't respawn an entity a player is interacting with as it only triggers on chunk load (i.e. when no players are nearby)
+        chunk.entities.forEach { if (config.id in it.scoreboardTags) it.remove() }
+
+        val entity = location.world.spawn(location, Interaction::class.java)
+        entity.addScoreboardTag(config.id)
+        entity.customName = config.displayName
+        entity.isCustomNameVisible = true
+
+    }
+
+
     fun createTypedNpc() {
         when (config.type) {
             "trader" -> createTraderNpc()
