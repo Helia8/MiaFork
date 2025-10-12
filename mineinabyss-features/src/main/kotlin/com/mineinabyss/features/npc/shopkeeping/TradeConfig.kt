@@ -29,14 +29,13 @@ class TradeTable(
         val gearyItems = getWorld("world")?.toGeary()?.getAddon(ItemTracking) ?: return null
         val recipes = mutableListOf<MerchantRecipe>()
         for (trade in trades) {
-            val inputItem: ItemStack = gearyItems.createItem(PrefabKey.Companion.of(trade.input.prefab)) ?: error("Incorrect prefab key: ${trade.input.prefab}")
+            val inputItem: ItemStack = gearyItems.createItem(PrefabKey.of(trade.input.prefab)) ?: error("Incorrect prefab key: ${trade.input.prefab}")
             inputItem.amount = trade.input.amount
-            val outputItem = gearyItems.createItem(PrefabKey.Companion.of(trade.output.prefab)) ?: error("Incorrect prefab key: ${trade.output.prefab}")
+            val outputItem = gearyItems.createItem(PrefabKey.of(trade.output.prefab)) ?: error("Incorrect prefab key: ${trade.output.prefab}")
             outputItem.amount = trade.output.amount
 
             val recipe = MerchantRecipe(outputItem, 99999)
             recipe.addIngredient(inputItem)
-
             recipes.add(recipe)
         }
         return recipes

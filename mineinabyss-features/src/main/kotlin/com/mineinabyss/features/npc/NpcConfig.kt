@@ -32,6 +32,7 @@ data class Npc(
     val tradeTableId: String, // use id pulled from config instead to be more modular
     val type: String, // "trader", "gondola_unlocker", "quest_giver", "dialogue"
     val dialog_id: String? = null,
+    val ticket_id: String? = null,
 ) {
 
     fun FallbackInteraction(player: Player) {
@@ -56,10 +57,24 @@ data class Npc(
 
 
     fun gondolaUnlockerInteraction() {
+        // just a matter of gondola.unlockroute(ticket_id) most likely
 
     }
     fun questGiverInteraction() {
-
+        // this one is a bit more finicky, tho I think i'll do something like:
+        // give the player a "objective" component, which would be something like:
+        // (quest_id | progress | max_progress | completion_action)
+        // so most of them are straightforward, and completion_action would be like an event listener of a specific type
+        // so I guess it would also be like another object like
+        // (event_type | event_data), where type could be like "kill" and data would be like "mob", so when we register our quest listeners,
+        // we would do something like :
+        // onMobKill
+        // killer = player
+        // if (killer has objective component with event_type "kill" and event_data == mob)
+        // objective.progress++
+        // same for every quest type we support
+        // then we could also have a "success" function, the listener would invoke if objective.progress >= objective.max_progress
+        // and it would go like, player.objective.displaysuccessmessage or some variation of that
     }
 
 }

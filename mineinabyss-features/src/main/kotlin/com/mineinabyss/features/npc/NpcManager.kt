@@ -8,11 +8,19 @@ import org.aselstudios.luxdialoguesapi.LuxDialoguesAPI
 import org.bukkit.event.entity.EntityInteractEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 
+
+// how to use:
+// load npcs config from config
+// load list of all dialogs ids
+// create NpcManager with npcs config, world, and dialogs ids
+// init it
+// register listeners
 class NpcManager(
     val npcsConfig: NpcsConfig,
     val world: World,
     val dialogsIds: List<String>
 ) {
+    // probably not needed
     var npcEntities: List<NpcEntity> = emptyList()
     val npcMap: MutableMap<Long, List<NpcEntity>> = mutableMapOf()
 
@@ -31,7 +39,7 @@ class NpcManager(
     @EventHandler
     fun ChunkLoadEvent.handleNpcSpawn() {
         //spawn npc
-        npcMap[chunk.chunkKey]?.forEach(NpcEntity::createTypedNpc)
+        npcMap[chunk.chunkKey]?.forEach(NpcEntity::createBaseNpc)
     }
 
 
@@ -41,7 +49,7 @@ class NpcManager(
         val NpcData = entity.get<Npc>() ?: return
         val dialogId: String? = NpcData.dialog_id
         // execute /ld send player dialogId
-
+        // TODO: use api once I get doc
         if (dialogId != null && dialogId in dialogsIds) {
             val command = "ld send ${player.name} $dialogId"
             player.server.dispatchCommand(player.server.consoleSender, command)

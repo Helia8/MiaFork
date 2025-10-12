@@ -3,6 +3,7 @@ package com.mineinabyss.features.npc.NpcAction
 import com.mineinabyss.features.abyss
 import kotlinx.serialization.Serializable
 import org.bukkit.entity.Player
+import org.aselstudios.luxdialoguesapi.Builders.Dialogue
 
 @Serializable
 class DialogueAction(

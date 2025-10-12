@@ -21,9 +21,6 @@ class NpcEntity(
     val config: Npc,
     val mainWorld: World,
 ) {
-
-
-
     fun createBaseNpc() {
         val location = config.location
         val chunk = location.chunk
@@ -35,10 +32,9 @@ class NpcEntity(
         entity.addScoreboardTag(config.id)
         entity.customName = config.displayName
         entity.isCustomNameVisible = true
-
     }
 
-
+    // everything else in this file is probably not gonna get used
     fun createTypedNpc() {
         when (config.type) {
             "trader" -> createTraderNpc()
@@ -48,15 +44,6 @@ class NpcEntity(
             else -> throw IllegalArgumentException("Unknown type ${config.type}")
         }
     }
-
-
-
-
-
-
-
-
-
 
     fun createDialogueNpc() {
 
