@@ -35,6 +35,7 @@ class NpcEntity(
     }
 
     // everything else in this file is probably not gonna get used
+    //-------------------------------------------
     fun createTypedNpc() {
         when (config.type) {
             "trader" -> createTraderNpc()
