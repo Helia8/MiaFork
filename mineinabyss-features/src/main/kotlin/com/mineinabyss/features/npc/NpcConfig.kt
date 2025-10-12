@@ -1,7 +1,7 @@
-package com.mineinabyss.features.npc.shopkeeping
+package com.mineinabyss.features.npc
 
+import com.mineinabyss.features.npc.shopkeeping.TradeTable
 import com.mineinabyss.idofront.serialization.LocationSerializer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.bukkit.Location
 
@@ -12,12 +12,14 @@ data class Npc(
     val location: @Serializable(LocationSerializer::class) Location,
     val scale: List<Double>, // ??
     val bbModel: String, // unsure, actually I guess it would be serializable
-    val tradeTable: TradeTable,
+    val tradeTable: TradeTable, // todo: remove
+    val tradeTableId: String, // use id pulled from config instead to be more modular
+    val type: String, // "trader", "gondola_unlocker", "quest_giver", "dialogue"
 ) {
 
 }
 
 @Serializable
 class NpcsConfig(
-    val npcs: List<Npc> = emptyList(),
+    val npcs: Map<String, Npc>
 )

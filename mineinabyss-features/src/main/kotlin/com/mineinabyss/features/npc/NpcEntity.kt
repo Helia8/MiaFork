@@ -1,36 +1,60 @@
-package com.mineinabyss.features.npc.shopkeeping
+package com.mineinabyss.features.npc
 
-import com.mineinabyss.chatty.helpers.globalChannel
-import com.mineinabyss.geary.modules.geary
-import com.mineinabyss.geary.papermc.gearyPaper
+import com.mineinabyss.features.abyss
+import com.mineinabyss.features.npc.shopkeeping.Trade
 import com.mineinabyss.geary.papermc.toGeary
-import com.mineinabyss.geary.papermc.tracking.items.*
+import com.mineinabyss.geary.papermc.tracking.items.ItemTracking
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.idofront.messaging.info
 import org.bukkit.Bukkit
-import org.bukkit.Chunk
-import org.bukkit.Material
 import org.bukkit.World
-import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.Interaction
-import org.bukkit.entity.ItemDisplay
-import org.bukkit.entity.Villager
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.MenuType
 import org.bukkit.inventory.MerchantRecipe
 import org.bukkit.plugin.Plugin
-import kotlin.getValue
 
 class NpcEntity(
     val config: Npc,
     val mainWorld: World,
-    val plugin: Plugin,
 ) {
 
-    fun createNpc() {
+
+    fun createTypedNpc() {
+        when (config.type) {
+            "trader" -> createTraderNpc()
+            "gondola_unlocker" -> createGondolaUnlockerNpc()
+            "quest_giver" -> createQuestGiverNpc()
+            "dialogue" -> createDialogueNpc()
+            else -> throw IllegalArgumentException("Unknown type ${config.type}")
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+    fun createDialogueNpc() {
+
+    }
+
+    fun createQuestGiverNpc() {
+
+    }
+
+    fun createGondolaUnlockerNpc() {
+
+    }
+
+    fun createTraderNpc() {
         if (config.tradeTable.trades.isNotEmpty()) {
 
             val location = config.location
@@ -65,10 +89,10 @@ class NpcEntity(
                         val new_recipe = createMerchantRecipes(config.tradeTable.trades)
                         merchant.recipes = new_recipe
 
-                        player.openMerchant(merchant, true)
+                        MenuType.MERCHANT.builder().merchant(merchant).build(player).open()
                     }
                 }
-            }, plugin)
+            }, abyss.plugin)
         }
 
         return
@@ -78,9 +102,9 @@ class NpcEntity(
         val gearyItems = mainWorld.toGeary().getAddon(ItemTracking)
         val recipes = mutableListOf<MerchantRecipe>()
         for (trade in trades) {
-            val inputItem: ItemStack = gearyItems.createItem(PrefabKey.of(trade.input.prefab)) ?: error("Incorrect prefab key: ${trade.input.prefab}")
+            val inputItem: ItemStack = gearyItems.createItem(PrefabKey.Companion.of(trade.input.prefab)) ?: error("Incorrect prefab key: ${trade.input.prefab}")
             inputItem.amount = trade.input.amount
-            val outputItem = gearyItems.createItem(PrefabKey.of(trade.output.prefab)) ?: error("Incorrect prefab key: ${trade.output.prefab}")
+            val outputItem = gearyItems.createItem(PrefabKey.Companion.of(trade.output.prefab)) ?: error("Incorrect prefab key: ${trade.output.prefab}")
             outputItem.amount = trade.output.amount
 
             val recipe = MerchantRecipe(outputItem, 99999)

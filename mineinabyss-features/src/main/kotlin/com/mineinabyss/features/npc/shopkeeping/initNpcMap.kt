@@ -1,6 +1,7 @@
 package com.mineinabyss.features.npc.shopkeeping
 
-import org.bukkit.Chunk
+import com.mineinabyss.features.npc.NpcEntity
+import com.mineinabyss.features.npc.NpcsConfig
 import org.bukkit.plugin.Plugin
 
 fun initNpcMap(config: NpcsConfig, plugin: Plugin): MutableMap<Long, List<NpcEntity>> {
