@@ -9,8 +9,8 @@ fun initNpcMap(config: NpcsConfig, plugin: Plugin): MutableMap<Long, List<NpcEnt
 
     println("config created ")
     for (npc in config.npcs) {
-        val chunkKey = npc.location.chunk.chunkKey
-        val npcEntity = NpcEntity(npc, npc.location.world, plugin)
+        val chunkKey = npc.value.location.chunk.chunkKey
+        val npcEntity = NpcEntity(npc.value, npc.value.location.world)
         map[chunkKey] = map.getOrDefault(chunkKey, emptyList()) + npcEntity
     }
     return map

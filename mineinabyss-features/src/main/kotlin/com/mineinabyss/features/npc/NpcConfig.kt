@@ -81,5 +81,5 @@ data class Npc(
 
 @Serializable
 class NpcsConfig(
-    val npcs: Map<String, Npc>
+    val npcs: Map<String, Npc> = mapOf()
 )

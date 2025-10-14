@@ -5,6 +5,7 @@ import org.bukkit.World
 import org.bukkit.event.EventHandler
 import org.bukkit.event.world.ChunkLoadEvent
 import org.aselstudios.luxdialoguesapi.LuxDialoguesAPI
+import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityInteractEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 
@@ -19,7 +20,7 @@ class NpcManager(
     val npcsConfig: NpcsConfig,
     val world: World,
     val dialogsIds: List<String>
-) {
+): Listener {
     // probably not needed
     var npcEntities: List<NpcEntity> = emptyList()
     val npcMap: MutableMap<Long, List<NpcEntity>> = mutableMapOf()
