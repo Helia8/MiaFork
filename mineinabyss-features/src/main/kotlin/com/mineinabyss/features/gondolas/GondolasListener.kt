@@ -2,6 +2,7 @@ package com.mineinabyss.features.gondolas
 
 import com.mineinabyss.components.gondolas.Gondola
 import com.mineinabyss.components.gondolas.UnlockedGondolas
+import com.mineinabyss.features.gondolas.pass.TicketConfig
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.idofront.messaging.error
 import org.bukkit.entity.Player
@@ -17,6 +18,7 @@ import kotlin.compareTo
 import kotlin.div
 import kotlin.text.get
 import net.kyori.adventure.key.Key
+import org.bukkit.Location
 
 class GondolasListener : Listener {
     private val playerZoneEntry = mutableMapOf<UUID, Pair<String, Long>>()
@@ -24,10 +26,7 @@ class GondolasListener : Listener {
     private val lastErrorTime = mutableMapOf<UUID, Long>()
     private val errorCooldown = 5000
 
-    @EventHandler
-    fun PlayerMoveEvent.onPlayerMove() {
-        if (!hasExplicitlyChangedBlock()) return
-
+    private fun handleGondola(player: Player) {
         val gondolas = LoadedGondolas.loaded
         val now = System.currentTimeMillis()
 
@@ -43,7 +42,12 @@ class GondolasListener : Listener {
         if (nearbyGondolaData.id !in unlockedGondolas.keys) return showError(player, nearbyGondolaData.gondola, now)
 
         if (player.uniqueId in justWarped) return
-        handleWarpCooldown(player, nearbyGondolaData, now)
+        handleWarpCooldown(player, nearbyGondolaData, now, nearbyGondolaData.id)
+    }
+    @EventHandler
+    fun PlayerMoveEvent.onPlayerMove() {
+        if (!hasExplicitlyChangedBlock()) return
+        handleGondola(player)
     }
 
     private fun showError(player: Player, gondola: Gondola, now: Long) {
@@ -69,6 +73,8 @@ class GondolasListener : Listener {
                 if (remaining > 0) {
                     val seconds = remaining / 1000
                     player.sendActionBar("Warping in $seconds seconds...")
+                } else {
+                    handleGondola(player)
                 }
             }
         }, 1L, 1L)
@@ -78,7 +84,7 @@ class GondolasListener : Listener {
         player: Player,
         data: GondolaData,
         now: Long,
-        
+        gondolaId: String? = null,
     ) {
         val entry = playerZoneEntry[player.uniqueId]
 
@@ -88,7 +94,7 @@ class GondolasListener : Listener {
             }
 
             now - entry.second >= data.gondola.warpCooldown -> {
-                gondolaWarp(data.gondola, player, data.type, gondolaId, ticketConfig)
+                gondolaWarp(data.gondola, player, data.type, gondolaId)
                 playerZoneEntry.remove(player.uniqueId)
                 justWarped.add(player.uniqueId)
             }

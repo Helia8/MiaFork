@@ -4,6 +4,7 @@ import com.bergerkiller.reflection.org.bukkit.BSimplePluginManager.plugins
 import com.mineinabyss.components.gondolas.UnlockedGondolas
 import com.mineinabyss.features.abyss
 import com.mineinabyss.features.gondolas.pass.TicketConfig
+import com.mineinabyss.features.gondolas.pass.TicketConfigHolder
 import com.mineinabyss.features.gondolas.pass.unlockRoute
 import com.mineinabyss.features.okibotravel.OkiboTravelFeature
 import com.mineinabyss.features.okibotravel.OkiboTravelFeature.Context
@@ -45,6 +46,7 @@ class GondolaFeature : FeatureWithContext<GondolaFeature.Context>(::Context) {
         //createGondolaTracker()
         plugin.listeners(context.gondolasListener)
         context.gondolasListener.startCooldownDisplayTask(plugin)
+        TicketConfigHolder.config = context.ticketsCfg
         mainCommand {
             "gondola"(desc = "Commands for gondolas") {
                 permission = "mineinabyss.gondola"
