@@ -27,6 +27,7 @@ allprojects {
     }
 
     dependencies {
+
         val idofrontLibs = rootProject.idofrontLibs
         val libs = rootProject.libs
 
@@ -73,7 +74,8 @@ allprojects {
         compileOnly(libs.minecraft.plugin.shopkeepers)
 
         // LuxDialogue
-        implementation("org.aselstudios:LuxDialoguesAPI:2.0.6")
+        compileOnly("org.aselstudios:LuxDialoguesAPI:2.0.6")
+
     }
 }
 
