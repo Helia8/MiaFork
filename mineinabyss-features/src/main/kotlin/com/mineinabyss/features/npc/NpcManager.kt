@@ -1,12 +1,14 @@
 package com.mineinabyss.features.npc
 
+import com.mineinabyss.features.npc.NpcAction.DialogData
+import com.mineinabyss.features.npc.NpcAction.DialogsConfig
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import org.bukkit.World
 import org.bukkit.event.EventHandler
 import org.bukkit.event.world.ChunkLoadEvent
 import org.aselstudios.luxdialoguesapi.LuxDialoguesAPI
+import org.bukkit.entity.Interaction
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityInteractEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 
 
@@ -19,7 +21,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 class NpcManager(
     val npcsConfig: NpcsConfig,
     val world: World,
-    val dialogsIds: List<String>
+    val dialogsConfig: DialogsConfig,
 ): Listener {
     // probably not needed
     var npcEntities: List<NpcEntity> = emptyList()
@@ -29,12 +31,15 @@ class NpcManager(
     fun initNpc() {
         // load npc config
         for (npc in npcsConfig.npcs.values) {
-            val npcEntity = NpcEntity(npc, world)
+            val npcEntity = NpcEntity(npc, world, dialogsConfig)
             npcEntities = npcEntities + npcEntity
 
             val chunkKey = npc.location.chunk.chunkKey
             npcMap[chunkKey] = npcMap.getOrDefault(chunkKey, emptyList()) + npcEntity
+            println("Loaded NPC ${npc.id} at chunk $chunkKey")
         }
+    println("NPC Manager initialized with ${npcEntities.size} NPCs.")
+    println("npc values are ${npcsConfig.npcs.values}")
     }
 
     @EventHandler
@@ -47,27 +52,36 @@ class NpcManager(
     @EventHandler
     fun PlayerInteractEntityEvent.handleNpcInteraction() {
         val player = this.player
-        if (LuxDialoguesAPI.getProvider().isInDialogue(player))  {
-            println("Player is already in a dialogue")
+        val entity = this.rightClicked
+        val gearyEntity = entity.toGearyOrNull() ?: return
+        val NpcData = gearyEntity.get<Npc>() ?: return
+        val dialogId: String? = NpcData.dialogId
+        if (entity !is Interaction) {
             return
-        } else {
-            println("Player is not in a dialogue")
         }
-        val entity = this.rightClicked.toGearyOrNull() ?: return
-        val NpcData = entity.get<Npc>() ?: return
-        val dialogId: String? = NpcData.dialog_id
-        // execute /ld send player dialogId
-
-        // TODO: use api once I get doc
-        if (dialogId != null ) {
-            NpcData.FallbackInteraction(player)
-//            val command = "ld send ${player.name} $dialogId"
-//            player.server.dispatchCommand(player.server.consoleSender, command)
+//        val previous = entity.lastInteraction
+//        val timeprev = previous?.timestamp
+//        val prevplayer = previous?.player
+//        val now = System.currentTimeMillis()
+//        val five_sec = 5000L
+//        if (prevplayer == player && timeprev != null && now - timeprev < five_sec) {
+//            player.error("Please wait before interacting again.")
+//            this.isCancelled = true
+//            return
+//        }
+        val dialogData = gearyEntity.get<DialogData>()
+        if (dialogData == null) {
+            player.sendMessage("dialog data missing for npc ${NpcData.id}")
+        }
+        if (dialogId != null && dialogData != null) {
+            NpcData.defaultInteraction(player, dialogId, dialogData)
         } else {
-            NpcData.FallbackInteraction(player)
+            if (dialogId != null) {
+                player.sendMessage("This NPC is missing dialog data for ID: $dialogId")
+                NpcData.fallbackInteraction(player)
+            }
         }
     }
-
 }
 
 

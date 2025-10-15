@@ -1,6 +1,8 @@
 package com.mineinabyss.features.npc
 
 import com.mineinabyss.features.abyss
+import com.mineinabyss.features.npc.NpcAction.DialogData
+import com.mineinabyss.features.npc.NpcAction.DialogsConfig
 import com.mineinabyss.features.npc.shopkeeping.Trade
 import com.mineinabyss.geary.papermc.toGeary
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
@@ -16,25 +18,43 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.MenuType
 import org.bukkit.inventory.MerchantRecipe
-import org.bukkit.plugin.Plugin
 
 class NpcEntity(
     val config: Npc,
     val mainWorld: World,
+    dialogsConfig: DialogsConfig,
+    val dialogData: DialogData? = dialogsConfig.configs[config.dialogId]
 ) {
+
     fun createBaseNpc() {
         val location = config.location
         val chunk = location.chunk
         // delete the old entity if it exists and respawn a newer version instead
         // note: we can't respawn an entity a player is interacting with as it only triggers on chunk load (i.e. when no players are nearby)
-        chunk.entities.forEach { if (config.id in it.scoreboardTags) it.remove() }
+        chunk.entities.forEach {
+            if (config.id in it.scoreboardTags) {
+                println("removed old npc entity with id ${config.id}")
+                it.remove()
+            } else {
+                println("no old npc entity with id ${config.id} found")
+            }
+        }
 
         val entity = location.world.spawn(location, Interaction::class.java)
         entity.addScoreboardTag(config.id)
         entity.customName = config.displayName
         entity.isCustomNameVisible = true
+        entity.isPersistent = false
         entity.isResponsive = true
-        entity.toGearyOrNull()?.set<Npc>(this@NpcEntity.config)
+        val gearyEntity = entity.toGearyOrNull()?: return
+        gearyEntity.set<Npc>(this@NpcEntity.config)
+        if (dialogData != null) {
+            gearyEntity.set<DialogData>(this@NpcEntity.dialogData)
+            println("dialogg data set")
+        } else {
+            println("couldnt set dialog data for npc ${config.id}")
+        }
+
     }
 
     // everything else in this file is probably not gonna get used
