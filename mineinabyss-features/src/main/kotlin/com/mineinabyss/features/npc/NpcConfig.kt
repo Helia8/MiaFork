@@ -1,6 +1,7 @@
 package com.mineinabyss.features.npc
 
 import com.mineinabyss.features.abyss
+import com.mineinabyss.features.npc.NpcAction.DialogueAction
 import com.mineinabyss.features.npc.shopkeeping.Trade
 import com.mineinabyss.features.npc.shopkeeping.TradeTable
 import com.mineinabyss.geary.papermc.toGeary
@@ -40,7 +41,7 @@ data class Npc(
             "trader" -> traderInteraction(player)
             "gondola_unlocker" -> gondolaUnlockerInteraction()
             "quest_giver" -> questGiverInteraction()
-            "dialogue" -> player.sendMessage("This NPC has no dialogue configured.")
+            "dialogue" -> dialogInteraction(player)
             else -> throw IllegalArgumentException("Unknown NPC type: $type")
         }
     }
@@ -54,6 +55,9 @@ data class Npc(
         return
     }
 
+    fun dialogInteraction(player: Player) {
+        DialogueAction().openDialogue(player)
+    }
 
 
     fun gondolaUnlockerInteraction() {

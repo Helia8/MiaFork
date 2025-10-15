@@ -7,5 +7,4 @@ class GondolaAction {
 }
 @Serializable
 class GondolaUnlockAction(
-    val dialogAction: DialogueAction,
 )

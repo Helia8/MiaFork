@@ -3,6 +3,7 @@ package com.mineinabyss.features.npc
 import com.mineinabyss.features.abyss
 import com.mineinabyss.features.npc.shopkeeping.Trade
 import com.mineinabyss.geary.papermc.toGeary
+import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import com.mineinabyss.geary.papermc.tracking.items.ItemTracking
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.idofront.messaging.info
@@ -32,6 +33,8 @@ class NpcEntity(
         entity.addScoreboardTag(config.id)
         entity.customName = config.displayName
         entity.isCustomNameVisible = true
+        entity.isResponsive = true
+        entity.toGearyOrNull()?.set<Npc>(this@NpcEntity.config)
     }
 
     // everything else in this file is probably not gonna get used

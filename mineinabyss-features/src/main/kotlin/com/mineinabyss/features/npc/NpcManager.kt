@@ -44,16 +44,25 @@ class NpcManager(
     }
 
 
+    @EventHandler
     fun PlayerInteractEntityEvent.handleNpcInteraction() {
         val player = this.player
+        if (LuxDialoguesAPI.getProvider().isInDialogue(player))  {
+            println("Player is already in a dialogue")
+            return
+        } else {
+            println("Player is not in a dialogue")
+        }
         val entity = this.rightClicked.toGearyOrNull() ?: return
         val NpcData = entity.get<Npc>() ?: return
         val dialogId: String? = NpcData.dialog_id
         // execute /ld send player dialogId
+
         // TODO: use api once I get doc
-        if (dialogId != null && dialogId in dialogsIds) {
-            val command = "ld send ${player.name} $dialogId"
-            player.server.dispatchCommand(player.server.consoleSender, command)
+        if (dialogId != null ) {
+            NpcData.FallbackInteraction(player)
+//            val command = "ld send ${player.name} $dialogId"
+//            player.server.dispatchCommand(player.server.consoleSender, command)
         } else {
             NpcData.FallbackInteraction(player)
         }
