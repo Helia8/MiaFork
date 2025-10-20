@@ -1,5 +1,6 @@
 package com.mineinabyss.features.npc.NpcAction
 
+import com.mineinabyss.features.npc.Npc
 import com.mineinabyss.idofront.messaging.error
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -17,9 +18,10 @@ data class DialogueAction(
         player.sendMessage("Custom action executed!")
     }
 
-    fun execute(player: Player) {
+    fun execute(player: Player, npc: Npc) {
         when (name) {
             "customAction" -> customAction(player)
+//            "gondolaAction" ->
             else -> player.error("Error resolving action: $name")
         }
     }
@@ -32,12 +34,13 @@ class AnswerData(
     val replyMessage: String? = null,
     val action: DialogueAction? = null
 ) {
-    fun build(): Answer? {
+    val npc = null
+    fun build(npc: Npc): Answer? {
         val answer = Answer.Builder()
             .setAnswerText(text)
         if (placeholderCondition != null) answer.addCondition(placeholderCondition)
         if (replyMessage != null) answer.addReplyMessage(replyMessage)
-        if (action != null) answer.addCallback { player -> action.execute(player) }
+        if (action != null) answer.addCallback { player -> action.execute(player, npc) }
         return answer.build()
     }
 }
@@ -83,7 +86,7 @@ class DialogData(
     val pages: List<PageData> = emptyList(),
 ) {
 
-    fun build(id: String): Dialogue? {
+    fun build(id: String, npc: Npc): Dialogue? {
         val dialogue = Dialogue.Builder()
             .setDialogueID(id)
             .setDialogueSpeed(typingSpeed)
@@ -108,13 +111,13 @@ class DialogData(
 
         if (backgroundFog) dialogue.setFogImage("fog", "#000000")
 
-        answers.forEach { answerData -> dialogue.addAnswer(answerData.build()) }
+        answers.forEach { answerData -> dialogue.addAnswer(answerData.build(npc)) }
         pages.forEach { pageData -> dialogue.addPage(pageData.build()) }
         return dialogue.build()
     }
 
-    fun startDialogue(player: Player, id: String) {
-        val dialog = this.build(id) ?: return
+    fun startDialogue(player: Player, id: String, npc: Npc) {
+        val dialog = this.build(id, npc) ?: return
         LuxDialoguesAPI.getProvider().sendDialogue(player, dialog)
     }
 }

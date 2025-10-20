@@ -56,7 +56,7 @@ data class Npc(
     }
 
     fun dialogInteraction(player: Player, dialogId: String, dialogData: DialogData) {
-        dialogData.startDialogue(player, dialogId)
+        dialogData.startDialogue(player, dialogId, this)
     }
 
 
