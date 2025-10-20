@@ -6,64 +6,53 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.mineinabyss.features.guilds.database.GuildJoinType
 import com.mineinabyss.features.guilds.extensions.*
-import com.mineinabyss.features.guilds.menus.DecideMenus.decideInfoMenu
 import com.mineinabyss.features.guilds.menus.DecideMenus.decideMainMenu
-import com.mineinabyss.features.guilds.menus.DecideMenus.decideMemberMenu
 import com.mineinabyss.features.guilds.menus.GuildScreen.*
 import com.mineinabyss.features.guilds.menus.GuildScreen.Invite
 import com.mineinabyss.features.helpers.Text
 import com.mineinabyss.features.helpers.TitleItem
+import com.mineinabyss.features.helpers.di.Features
 import com.mineinabyss.features.helpers.ui.composables.Button
+import com.mineinabyss.guiy.canvas.GuiyOwner
+import com.mineinabyss.guiy.canvas.LocalGuiyOwner
 import com.mineinabyss.guiy.components.Spacer
 import com.mineinabyss.guiy.components.canvases.Chest
-import com.mineinabyss.guiy.components.canvases.MAX_CHEST_HEIGHT
-import com.mineinabyss.guiy.guiyPlugin
-import com.mineinabyss.guiy.inventory.GuiyOwner
-import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import com.mineinabyss.guiy.layout.Column
 import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
-import com.mineinabyss.guiy.navigation.Navigator
-import com.mineinabyss.guiy.navigation.UniversalScreens
+import com.mineinabyss.guiy.navigation.*
 import com.mineinabyss.idofront.messaging.error
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import io.papermc.paper.datacomponent.DataComponentTypes
-import io.papermc.paper.datacomponent.item.TooltipDisplay
-import net.wesjd.anvilgui.AnvilGUI
-import net.wesjd.anvilgui.AnvilGUI.ResponseAction
+import io.papermc.paper.registry.data.dialog.input.DialogInput
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 
-sealed class GuildScreen(var title: String, val height: Int) {
-    class Default(player: Player) : GuildScreen(title = ":space_-8:${decideMainMenu(player)}", height = 4)
+sealed class GuildScreen() {
+    class Default() : GuildScreen()
 
-    class GuildInfo(isGuildOwner: Boolean) : GuildScreen(":space_-8:${decideInfoMenu(isGuildOwner)}", 6)
+    class GuildInfo() : GuildScreen()
 
-    data object Leave : GuildScreen(":space_-8::guild_disband_or_leave_menu:", 5)
-    data object Disband : GuildScreen(":space_-8::guild_disband_or_leave_menu:", 5)
+    data object Leave : GuildScreen()
+    data object Disband : GuildScreen()
 
-    data object GuildList : GuildScreen(":space_-8::guild_list_menu:", 6)
-    class GuildLookupMembers(val guildName: GuildName) :
-        GuildScreen(":space_-8:${":guild_lookup_members${minOf(guildName.getGuildLevel(), 3)}"}:", minOf(guildName.getGuildLevel() + 3, MAX_CHEST_HEIGHT))
+    data object GuildList : GuildScreen()
+    class GuildLookupMembers(val guildName: GuildName) : GuildScreen()
 
     // Forgot to add to pack so this is fine for now
-    data object InviteList : GuildScreen(":space_-8::guild_inbox_list_menu:", 5)
-    class Invite(val owner: OfflinePlayer) : GuildScreen(":space_-8::guild_inbox_handle_menu:", 5)
+    data object InviteList : GuildScreen()
+    class Invite(val owner: OfflinePlayer) : GuildScreen()
 
-    data object JoinRequestList : GuildScreen(":space_-8::guild_inbox_list_menu:", 5)
-    class JoinRequest(val from: OfflinePlayer) : GuildScreen(":space_-8::guild_inbox_handle_menu:", 5)
+    data object JoinRequestList : GuildScreen()
+    class JoinRequest(val from: OfflinePlayer) : GuildScreen()
 
-    class MemberOptions(val member: OfflinePlayer) :
-        GuildScreen(":space_-8::guild_member_action_menu:", 5)
+    class MemberOptions(val member: OfflinePlayer) : GuildScreen()
 
-    class MemberList(val guildLevel: Int, player: Player) :
-        GuildScreen(":space_-8:${decideMemberMenu(player, player.getGuildJoinType())}", minOf(guildLevel + 2, MAX_CHEST_HEIGHT))
+    class MemberList() : GuildScreen()
 }
-
-typealias GuildNav = Navigator<GuildScreen>
 
 class GuildUIScope(
     val player: Player,
@@ -75,7 +64,6 @@ class GuildUIScope(
     val guildOwner get() = player.getGuildOwner()?.toOfflinePlayer()
     val memberCount get() = player.getGuildMemberCount()
     val guildBalance get() = player.getGuildBalance()
-    val nav = GuildNav { Default(player) }
 }
 
 @Composable
@@ -83,44 +71,90 @@ fun GuildMainMenu(player: Player, openedFromHQ: Boolean = false) {
     val owner = LocalGuiyOwner.current
     val scope = remember { GuildUIScope(player, owner) }
     scope.apply {
-        nav.withScreen(setOf(player), onEmpty = owner::exit) { screen ->
-            Chest(
-                setOf(player),
-                screen.title,
-                Modifier.height(screen.height),
-                onClose = { player.closeInventory() }) {
-                when (screen) {
-                    is Default -> HomeScreen(openedFromHQ)
-                    is GuildInfo -> GuildInfoScreen()
-                    Leave -> GuildLeaveScreen()
-                    is GuildList -> GuildLookupListScreen()
-                    is GuildLookupMembers -> GuildLookupMembersScreen(screen.guildName)
-                    InviteList -> GuildInviteListScreen()
-                    is Invite -> GuildInviteScreen(screen.owner)
-                    JoinRequestList -> GuildJoinRequestListScreen()
-                    is JoinRequest -> GuildJoinRequestScreen(screen.from)
-                    Disband -> GuildDisbandScreen()
-                    is MemberOptions -> GuildMemberOptionsScreen(screen.member)
-                    is MemberList -> GuildMemberListScreen()
-                }
+        val nav = rememberNavController()
+        NavHost<GuildScreen>(nav, startDestination = Default()) {
+            composable<Default> {
+                HomeScreen(
+                    openedFromHQ,
+                    onNavigateToInfo = { nav.navigate(GuildInfo()) },
+                    onNavigateToGuildList = { nav.navigate(GuildList) },
+                    onNavigateToDefault = {
+                        nav.reset()
+                        nav.navigate(Default())
+                    },
+                    onNavigateToInviteList = { nav.navigate(InviteList) },
+                    onBack = { nav.popBackStack() },
+                )
+            }
+            composable<GuildInfo> {
+                GuildInfoScreen(
+                    onNavigateToMemberList = { nav.navigate(MemberList()) },
+                    onNavigateToDisband = { nav.navigate(Disband) },
+                    onNavigateToLeave = { nav.navigate(Leave) },
+                )
+            }
+            composable<Leave> { GuildLeaveScreen() }
+            composable<GuildList> {
+                GuildLookupListScreen(
+                    onNavigateToMemberList = { nav.navigate(MemberList()) },
+                    onNavigateToLookupMembers = { nav.navigate(GuildLookupMembers(it)) }
+                )
+            }
+            composable<GuildLookupMembers> { screen -> GuildLookupMembersScreen(screen.guildName) }
+            composable<InviteList> {
+                GuildInviteListScreen(
+                    onNavigateToInviteScreen = { nav.navigate(Invite(it)) },
+                    onNavigateToMemberList = { nav.navigate(MemberList()) }
+                )
+            }
+            composable<Invite> { screen ->
+                GuildInviteScreen(
+                    screen.owner,
+                    onBack = { nav.popBackStack() },
+                    onNavigateHome = { nav.reset() },
+                )
+            }
+            composable<JoinRequestList> {
+                GuildJoinRequestListScreen(
+                    onNavigateToJoinRequest = { nav.navigate(JoinRequest(it)) },
+                    onBack = { nav.popBackStack() },
+                )
+            }
+            composable<JoinRequest> { screen -> GuildJoinRequestScreen(screen.from, onBack = { nav.popBackStack() }) }
+            composable<Disband> { GuildDisbandScreen() }
+            composable<MemberOptions> { screen -> GuildMemberOptionsScreen(screen.member, onBack = { nav.popBackStack() }) }
+            composable<MemberList> {
+                GuildMemberListScreen(
+                    onNavigateToMemberOptions = { nav.navigate(MemberOptions(it)) },
+                    onNavigateToJoinRequests = { nav.navigate(JoinRequestList) }
+                )
             }
         }
     }
 }
 
 @Composable
-fun GuildUIScope.HomeScreen(openedFromHQ: Boolean) {
+fun GuildUIScope.HomeScreen(
+    openedFromHQ: Boolean,
+    onNavigateToInfo: () -> Unit,
+    onNavigateToGuildList: () -> Unit,
+    onNavigateToInviteList: () -> Unit,
+    onNavigateToDefault: () -> Unit,
+    onBack: () -> Unit,
+) = Chest(":space_-8:${decideMainMenu(player)}", Modifier.height(4)) {
     val guildOwner by remember { mutableStateOf(player.isGuildOwner()) }
     Row(Modifier.at(2, 1)) {
-        if (player.hasGuild()) CurrentGuildButton(onClick = { nav.open(GuildInfo(guildOwner)) })
-        else CreateGuildButton(openedFromHQ = openedFromHQ)
+        if (player.hasGuild()) CurrentGuildButton(onClick = onNavigateToInfo)
+        else CreateGuildButton(
+            openedFromHQ = openedFromHQ, onNavigateToDefault, onBack
+        )
 
         Spacer(1)
-        GuildLookupListButton()
+        GuildLookupListButton(onNavigateToGuildList)
     }
 
     Column(Modifier.at(8, 0)) {
-        GuildInvitesButton()
+        GuildInvitesButton(onNavigateToInviteList)
     }
 
     CloseButton(Modifier.at(0, 3))
@@ -128,14 +162,15 @@ fun GuildUIScope.HomeScreen(openedFromHQ: Boolean) {
 
 @Composable
 fun GuildUIScope.BackButton(modifier: Modifier = Modifier) {
-    Button(onClick = { nav.back() }, modifier = modifier) {
+    val dispatcher = LocalBackGestureDispatcher.current
+    Button(onClick = { dispatcher.onBack() }, modifier = modifier) {
         Text("<red><b>Back".miniMsg())
     }
 }
 
 @Composable
 fun GuildUIScope.CloseButton(modifier: Modifier = Modifier) {
-    Button(onClick = { player.closeInventory() }, modifier = modifier) {
+    Button(onClick = { owner.exit() }, modifier = modifier) {
         Text("<red><b>Close".miniMsg())
     }
 }
@@ -158,32 +193,45 @@ fun GuildUIScope.CurrentGuildButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun GuildUIScope.CreateGuildButton(openedFromHQ: Boolean) {
+fun GuildUIScope.CreateGuildButton(
+    openedFromHQ: Boolean,
+    onNavigateBack: () -> Unit,
+    onNavigateToDefault: () -> Unit,
+) {
     Button(
         enabled = !player.hasGuild(),
         onClick = {
             val guildRenamePaper = TitleItem.of("Guild Name")
             guildRenamePaper.setData(DataComponentTypes.TOOLTIP_DISPLAY, TitleItem.hideTooltip)
-            if (player.hasGuild()) {
-                player.error("You already have a guild.")
-                nav.back()
-            } else if (!openedFromHQ) {
-                player.error("You need to register your guild")
-                player.error("with the Guild Master at Orth GuildHQ.")
-                player.closeInventory()
-            } else nav.open(UniversalScreens.Anvil(
-                AnvilGUI.Builder()
-                    .title(":space_-61::guild_name_menu:")
-                    .itemLeft(guildRenamePaper)
-                    .itemOutput(TitleItem.transparentItem)
-                    .plugin(guiyPlugin)
-                    .onClose { nav.back() }
-                    .onClick { _, snapshot ->
-                        snapshot.player.createGuild(snapshot.text)
-                        nav.open(Default(snapshot.player))
-                        listOf(ResponseAction.close())
+            when {
+                player.hasGuild() -> {
+                    player.error("You already have a guild.")
+                    onNavigateBack()
+                }
+
+                !openedFromHQ -> {
+                    player.error("You need to register your guild")
+                    player.error("with the Guild Master at Orth GuildHQ.")
+                    owner.exit()
+                }
+
+                else -> {
+                    val maxGuildLength = Features.guilds.config.guildNameMaxLength
+                    val dialog = GuildDialogs(
+                        ":space_-28::guild_search_menu:", "<gold>Create Guild...", listOf(
+                            DialogInput.text("guild_dialog", "<gold>Create Guild with name...".miniMsg())
+                                .initial("${player.name}'s Guild").width(maxGuildLength * 10)
+                                .maxLength(maxGuildLength)
+                                .build()
+                        )
+                    ).createGuildLookDialog {
+                        player.createGuild(it)
+                        onNavigateToDefault()
                     }
-            ))
+
+                    player.showDialog(dialog)
+                }
+            }
         }
     ) { enabled ->
         if (enabled) Text("<gold><b>Create a Guild".miniMsg(), modifier = Modifier.size(2, 2))
@@ -197,11 +245,13 @@ fun GuildUIScope.CreateGuildButton(openedFromHQ: Boolean) {
 }
 
 @Composable
-fun GuildUIScope.GuildInvitesButton() {
+fun GuildUIScope.GuildInvitesButton(
+    onNavigateToInviteList: () -> Unit,
+) {
     val guildOwner = player.getGuildOwnerFromInvite().toOfflinePlayer()
     Button(
         enabled = player.hasGuildInvite(guildOwner),
-        onClick = { nav.open(InviteList) },
+        onClick = onNavigateToInviteList,
     ) { enabled ->
         /* Icon that notifies player there are new invites */
         if (enabled) Text("<dark_green>Manage Guild Invites".miniMsg())
@@ -211,10 +261,12 @@ fun GuildUIScope.GuildInvitesButton() {
 }
 
 @Composable
-fun GuildUIScope.GuildLookupListButton() {
+fun GuildUIScope.GuildLookupListButton(
+    onNavigateToGuildList: () -> Unit = {},
+) {
     Button(
         enabled = getAllGuilds().isNotEmpty(),
-        onClick = { nav.open(GuildList) }
+        onClick = onNavigateToGuildList,
     ) { enabled ->
         if (enabled) {
             Text("<gold><b>Browse all Guilds".miniMsg(), modifier = Modifier.size(2, 2))

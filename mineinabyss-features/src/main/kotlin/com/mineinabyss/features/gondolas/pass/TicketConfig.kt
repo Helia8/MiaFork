@@ -7,3 +7,7 @@ import kotlinx.serialization.Serializable
 data class TicketConfig (
     val tickets: Map<String, Ticket> = mapOf()
 )
+
+object TicketConfigHolder {
+    var config: TicketConfig ?= null;
+}

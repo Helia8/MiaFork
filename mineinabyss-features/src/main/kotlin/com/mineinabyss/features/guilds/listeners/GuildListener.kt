@@ -6,7 +6,7 @@ import com.mineinabyss.features.guilds.database.GuildMessageQueue
 import com.mineinabyss.features.guilds.database.GuildMessageQueue.content
 import com.mineinabyss.features.guilds.menus.GuildMainMenu
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
-import com.mineinabyss.guiy.inventory.guiy
+import com.mineinabyss.guiy.canvas.guiy
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +26,7 @@ class GuildListener : Listener {
     @EventHandler
     fun PlayerInteractAtEntityEvent.onInteractGuildMaster() {
         rightClicked.toGearyOrNull()?.get<GuildMaster>() ?: return
-        guiy { GuildMainMenu(player, true) }
+        guiy(player) { GuildMainMenu(player, true) }
     }
 
     private val databaseDispatcher = Dispatchers.IO.limitedParallelism(1)

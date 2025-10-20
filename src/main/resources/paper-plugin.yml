@@ -15,8 +15,13 @@ permissions:
   mineinabyss.stats:
     description: Allows players to see their stats
 
+depend: [LuxDialogues]
 dependencies:
   server:
+    LuxDialogues:
+      required: true
+      load: BEFORE
+      join-classpath: true
     Geary:
       required: true
       load: BEFORE

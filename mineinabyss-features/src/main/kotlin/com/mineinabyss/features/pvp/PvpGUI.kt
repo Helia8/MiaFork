@@ -7,6 +7,7 @@ import com.mineinabyss.features.helpers.TitleItem
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.features.pvp.ToggleIcon.disabled
 import com.mineinabyss.features.pvp.ToggleIcon.enabled
+import com.mineinabyss.guiy.canvas.LocalGuiyOwner
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.modifiers.Modifier
@@ -28,8 +29,7 @@ import org.bukkit.inventory.ItemStack
 
 @Composable
 fun PvpPrompt(player: Player) {
-    Chest(setOf(player), ":space_-8::pvp_menu_toggle:", Modifier.height(4),
-        onClose = { reopen() }) {
+    Chest(":space_-8::pvp_menu_toggle:", Modifier.height(4), onClose = {}) {
         EnablePvp(player, Modifier.at(1, 1))
         DisablePvp(player, Modifier.at(5, 1))
         TogglePvpPrompt(player, Modifier.at(8, 3))
@@ -38,6 +38,7 @@ fun PvpPrompt(player: Player) {
 
 @Composable
 fun EnablePvp(player: Player, modifier: Modifier) {
+    val owner = LocalGuiyOwner.current
     Item(
         TitleItem.of(
             "<dark_green><b>Enable PvP".miniMsg(),
@@ -51,13 +52,14 @@ fun EnablePvp(player: Player, modifier: Modifier) {
             }
             player.success("PvP has been enabled!")
             player.playSound(player.location, Sound.ITEM_ARMOR_EQUIP_GENERIC, 1f, 1f)
-            player.closeInventory()
+            owner.exit()
         }
     )
 }
 
 @Composable
 fun DisablePvp(player: Player, modifier: Modifier) {
+    val owner = LocalGuiyOwner.current
     Item(
         TitleItem.of(
             "<dark_red><b>Disable PvP".miniMsg(),
@@ -71,7 +73,7 @@ fun DisablePvp(player: Player, modifier: Modifier) {
             }
             player.error("PvP has been disabled!")
             player.playSound(player.location, Sound.ITEM_ARMOR_EQUIP_GENERIC, 1f, 0.1f)
-            player.closeInventory()
+            owner.exit()
         }
     )
 }

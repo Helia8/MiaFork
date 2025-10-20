@@ -10,24 +10,30 @@ import com.mineinabyss.features.helpers.TitleItem
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.guiy.components.HorizontalGrid
 import com.mineinabyss.guiy.components.Item
+import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.textcomponents.miniMsg
+import org.bukkit.OfflinePlayer
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 @Composable
-fun GuildUIScope.GuildInviteListScreen() {
-    GuildInvites(Modifier.at(1, 1))
-    DenyAllInvitesButton(Modifier.at(8, 4))
+fun GuildUIScope.GuildInviteListScreen(
+    onNavigateToInviteScreen: (owner: OfflinePlayer) -> Unit,
+    onNavigateToMemberList: () -> Unit,
+) = Chest(":space_-8::guild_inbox_list_menu:", Modifier.height(5)) {
+    GuildInvites(Modifier.at(1, 1), onNavigateToInviteScreen)
+    DenyAllInvitesButton(Modifier.at(8, 4), onNavigateToMemberList)
     BackButton(Modifier.at(2, 4))
 }
 
 @Composable
-fun GuildUIScope.GuildInvites(modifier: Modifier = Modifier) {
+fun GuildUIScope.GuildInvites(modifier: Modifier = Modifier, onNavigateToInviteScreen: (owner: OfflinePlayer) -> Unit) {
     /* Transaction to query GuildInvites and playerUUID */
     val owner = player.getGuildOwnerFromInvite().toOfflinePlayer()
     val memberCount = owner.getGuildMemberCount()
@@ -40,26 +46,29 @@ fun GuildUIScope.GuildInvites(modifier: Modifier = Modifier) {
     }
     HorizontalGrid(modifier.size(9, 4)) {
         invites.sortedBy { it.memberCount }.forEach { _ ->
-            Button(onClick = {
-                nav.open(GuildScreen.Invite(owner))
-            }) {
-                Item(TitleItem.head(
-                    player, "<gold><b>Guildname: <yellow><i>${owner.getGuildName()}".miniMsg(),
-                    "<blue>Click this to accept or deny invite.".miniMsg(),
-                    "<blue>Info about the guild can also be found in here.".miniMsg(),
-                    isFlat = true
-                ))
+            Button(onClick = { onNavigateToInviteScreen(owner) }) {
+                Item(
+                    TitleItem.head(
+                        player, "<gold><b>Guildname: <yellow><i>${owner.getGuildName()}".miniMsg(),
+                        "<blue>Click this to accept or deny invite.".miniMsg(),
+                        "<blue>Info about the guild can also be found in here.".miniMsg(),
+                        isFlat = true
+                    )
+                )
             }
         }
     }
 }
 
 @Composable
-fun GuildUIScope.DenyAllInvitesButton(modifier: Modifier) = Button(
+fun GuildUIScope.DenyAllInvitesButton(
+    modifier: Modifier,
+    onNavigateToMemberList: () -> Unit,
+) = Button(
     onClick = {
         player.removeGuildQueueEntries(GuildJoinType.INVITE, true)
-        nav.open(GuildScreen.MemberList(guildLevel, player))
         player.info("<gold><b>❌<yellow>You denied all invites!")
+        onNavigateToMemberList()
     },
     modifier = modifier
 ) {

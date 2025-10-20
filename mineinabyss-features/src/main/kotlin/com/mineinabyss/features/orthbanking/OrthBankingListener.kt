@@ -11,6 +11,6 @@ class OrthBankingListener : Listener {
     @EventHandler
     fun PlayerInteractEntityEvent.onInteractBanker() {
         rightClicked.toGearyOrNull()?.get<OrthBanker>() ?: return
-        //guiy { BankMenu(player) } // Comment out until we use a GUI for banking
+        //guiy(player) { BankMenu(player) } // Comment out until we use a GUI for banking
     }
 }

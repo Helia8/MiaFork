@@ -15,7 +15,7 @@ import com.mineinabyss.features.guilds.listeners.GuildListener
 import com.mineinabyss.features.guilds.menus.GuildMainMenu
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.geary.serialization.getOrSetPersisting
-import com.mineinabyss.guiy.inventory.guiy
+import com.mineinabyss.guiy.canvas.guiy
 import com.mineinabyss.idofront.commands.arguments.intArg
 import com.mineinabyss.idofront.commands.arguments.offlinePlayerArg
 import com.mineinabyss.idofront.commands.arguments.optionArg
@@ -139,7 +139,7 @@ class GuildFeature : FeatureWithContext<GuildFeature.Context>(::Context) {
                 }
                 "menu"(desc = "Open Guild Menu") {
                     playerAction {
-                        guiy { GuildMainMenu(player, true) }
+                        guiy(player) { GuildMainMenu(player, true) }
                     }
                 }
                 "admin" {

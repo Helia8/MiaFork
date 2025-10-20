@@ -10,6 +10,5 @@ data class GondolasConfig(
     init {
         LoadedGondolas.loaded.clear()
         LoadedGondolas.loaded.putAll(gondolas.mapKeys { it.key.lowercase() })
-
     }
 }

@@ -3,48 +3,54 @@ package com.mineinabyss.features.guilds.menus
 import androidx.compose.runtime.*
 import com.mineinabyss.features.guilds.database.GuildJoinType
 import com.mineinabyss.features.guilds.extensions.*
+import com.mineinabyss.features.guilds.menus.DecideMenus.decideMemberMenu
 import com.mineinabyss.features.helpers.Text
 import com.mineinabyss.features.helpers.TitleItem
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.VerticalGrid
+import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.components.canvases.MAX_CHEST_HEIGHT
 import com.mineinabyss.guiy.components.lists.NavbarPosition
 import com.mineinabyss.guiy.components.lists.ScrollDirection
 import com.mineinabyss.guiy.components.lists.Scrollable
-import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.click.clickable
+import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
-import com.mineinabyss.guiy.navigation.UniversalScreens
-import com.mineinabyss.idofront.entities.title
 import com.mineinabyss.idofront.messaging.error
+import com.mineinabyss.idofront.nms.entities.title
 import com.mineinabyss.idofront.resourcepacks.ResourcePacks
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.ItemLore
-import io.papermc.paper.datacomponent.item.TooltipDisplay
-import net.wesjd.anvilgui.AnvilGUI
+import io.papermc.paper.registry.data.dialog.input.DialogInput
 import org.bukkit.Material
+import org.bukkit.OfflinePlayer
 import org.bukkit.inventory.ItemStack
 
 @Composable
-fun GuildUIScope.GuildMemberListScreen() {
+fun GuildUIScope.GuildMemberListScreen(
+    onNavigateToMemberOptions: (member: OfflinePlayer) -> Unit,
+    onNavigateToJoinRequests: () -> Unit,
+) = Chest(":space_-8:${decideMemberMenu(player, player.getGuildJoinType())}", Modifier.height((guildLevel + 2).coerceAtMost(MAX_CHEST_HEIGHT))) {
     var line by remember { mutableStateOf(0) }
     val guildMembers = remember { player.getGuildMembers().sortedWith(compareBy { it.player.isConnected; it.player.name; it.rank.ordinal }) }
 
     Scrollable(
-        guildMembers, line, ScrollDirection.VERTICAL,
-        nextButton = { ScrollDownButton(Modifier.at(0, 3).clickable { line++ }) },
-        previousButton = { ScrollUpButton(Modifier.at(0, 1).clickable { line-- }) },
-        NavbarPosition.START, null
+        guildMembers, line,
+        onLineChange = { line = it },
+        nextButton = { ScrollDownButton(Modifier.at(0, 3)) },
+        previousButton = { ScrollUpButton(Modifier.at(0, 1)) },
+        scrollDirection = ScrollDirection.VERTICAL,
+        navbarPosition = NavbarPosition.START,
+        navbarBackground = null
     ) { members ->
         VerticalGrid(Modifier.at(1, 1).size(5, minOf(guildLevel + 1, 4))) {
             members.forEach { (rank, member) ->
                 Button(onClick = {
                     if (member != player && player.isCaptainOrAbove())
-                        nav.open(GuildScreen.MemberOptions(member))
+                        onNavigateToMemberOptions(member)
                 }) {
                     Item(
                         TitleItem.head(
@@ -61,7 +67,7 @@ fun GuildUIScope.GuildMemberListScreen() {
     BackButton(Modifier.at(0, minOf(guildLevel + 1, MAX_CHEST_HEIGHT - 1)))
 
     InviteToGuildButton(Modifier.at(7, 0))
-    ManageGuildJoinRequestsButton(Modifier.at(8, 0))
+    ManageGuildJoinRequestsButton(Modifier.at(8, 0), onNavigateToJoinRequests)
     ToggleGuildJoinTypeButton(Modifier.at(0, 0))
 }
 
@@ -95,19 +101,17 @@ fun GuildUIScope.InviteToGuildButton(modifier: Modifier) {
                 player.error("Change it to 'ANY' or 'INVITE-only' mode to invite others.")
                 return@Button
             }
-            nav.open(
-                UniversalScreens.Anvil(
-                AnvilGUI.Builder()
-                    .title(":space_-61::guild_search_menu:")
-                    .itemLeft(guildInvitePaper)
-                    .itemOutput(TitleItem.transparentItem)
-                    .plugin(guiyPlugin)
-                    .onClose { nav.back() }
-                    .onClick { _, snapshot ->
-                        snapshot.player.invitePlayerToGuild(snapshot.text)
-                        listOf(AnvilGUI.ResponseAction.close())
-                    }
-            ))
+
+            val dialog = GuildDialogs(
+                ":space_-28::guild_search_menu:", "Send Guild-Invite!", listOf(
+                    DialogInput.text("guild_dialog", "<gold>Search for Player to invite to your Guild...".miniMsg())
+                        .initial("").width(200)
+                        .maxLength(64)
+                        .build()
+                )
+            ).createGuildLookDialog { player.invitePlayerToGuild(it) }
+
+            player.showDialog(dialog)
         }
     ) {
         Text("<yellow><b>INVITE Player to Guild".miniMsg())
@@ -115,7 +119,10 @@ fun GuildUIScope.InviteToGuildButton(modifier: Modifier) {
 }
 
 @Composable
-private fun GuildUIScope.ManageGuildJoinRequestsButton(modifier: Modifier) {
+private fun GuildUIScope.ManageGuildJoinRequestsButton(
+    modifier: Modifier,
+    onNavigateToJoinRequests: () -> Unit,
+) {
     val requestAmount = player.getNumberOfGuildRequests()
     val plural = requestAmount != 1
     Button(
@@ -124,7 +131,7 @@ private fun GuildUIScope.ManageGuildJoinRequestsButton(modifier: Modifier) {
         modifier = modifier,
         onClick = {
             if (player.isCaptainOrAbove()) {
-                nav.open(GuildScreen.JoinRequestList)
+                onNavigateToJoinRequests()
             }
         }
     ) { enabled ->

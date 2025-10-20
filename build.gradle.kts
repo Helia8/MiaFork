@@ -8,8 +8,6 @@ plugins {
     alias(idofrontLibs.plugins.mia.papermc)
 }
 
-val mavenUser = if (project.hasProperty("mavenUser")) project.property("mavenUser") as String else System.getenv("MAVEN_USERNAME") ?: ""
-val mavenPassword = if (project.hasProperty("mavenPassword")) project.property("mavenPassword") as String else System.getenv("MAVEN_PASSWORD") ?: ""
 allprojects {
     apply(plugin = "java")
 
@@ -17,21 +15,19 @@ allprojects {
         mavenCentral()
         maven("https://repo.mineinabyss.com/releases")
         maven("https://repo.mineinabyss.com/snapshots")
-        maven("https://repo.hibiscusmc.com/releases/")
         maven("https://repo.mineinabyss.com/mirror")
         maven("https://repo.papermc.io/repository/maven-public/")
-        maven("https://repo.codemc.org/repository/maven-public/")
-        maven("https://repo.spaceio.xyz/repository/maven-public/")
-        maven("https://mvn.lumine.io/repository/maven-public/")
-        maven("https://nexus.scarsz.me/content/groups/public/") // DiscordSRV
-        maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
-        maven("https://ci.mg-dev.eu/plugin/repository/everything") // TrainCarts
-        maven("https://raw.githubusercontent.com/Shopkeepers/Repository/main/releases/") // Shopkeepers
-        maven("https://jitpack.io")
         mavenLocal()
+
+        // LuxDialogues
+        maven {
+            name = "aselstudiosRepository"
+            url = uri("https://repo.aselstudios.com/releases")
+        }
     }
 
     dependencies {
+
         val idofrontLibs = rootProject.idofrontLibs
         val libs = rootProject.libs
 
@@ -43,6 +39,11 @@ allprojects {
         compileOnly(libs.geary.papermc)
 
         // MineInAbyss platform
+        implementation(idofrontLibs.exposed.core) { isTransitive = false }
+        implementation(idofrontLibs.exposed.dao) { isTransitive = false }
+        implementation(idofrontLibs.exposed.jdbc) { isTransitive = false }
+        implementation(idofrontLibs.exposed.javatime) { isTransitive = false }
+
         compileOnly(idofrontLibs.bundles.idofront.core)
         compileOnly(idofrontLibs.kotlin.stdlib)
         compileOnly(idofrontLibs.kotlinx.serialization.json)
@@ -50,12 +51,7 @@ allprojects {
         compileOnly(idofrontLibs.kotlinx.coroutines)
         compileOnly(idofrontLibs.minecraft.mccoroutine)
         compileOnly(idofrontLibs.reflections)
-        compileOnly(idofrontLibs.exposed.core) { isTransitive = false }
-        compileOnly(idofrontLibs.exposed.dao) { isTransitive = false }
-        compileOnly(idofrontLibs.exposed.jdbc) { isTransitive = false }
-        compileOnly(idofrontLibs.exposed.javatime) { isTransitive = false }
         compileOnly(idofrontLibs.sqlite.jdbc)
-        compileOnly(idofrontLibs.minecraft.anvilgui)
 
         // Plugin libs
         compileOnly(idofrontLibs.minecraft.plugin.modelengine)
@@ -76,6 +72,10 @@ allprojects {
         compileOnly(libs.minecraft.plugin.tccoasters)
         compileOnly(libs.minecraft.plugin.mythichud)
         compileOnly(libs.minecraft.plugin.shopkeepers)
+
+        // LuxDialogue
+        compileOnly("org.aselstudios:LuxDialoguesAPI:2.0.6")
+
     }
 }
 
