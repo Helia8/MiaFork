@@ -21,7 +21,7 @@ data class DialogueAction(
     fun execute(player: Player, npc: Npc) {
         when (name) {
             "customAction" -> customAction(player)
-//            "gondolaAction" ->
+            "gondolaAction" -> npc.gondolaUnlockerInteraction(player)
             else -> player.error("Error resolving action: $name")
         }
     }

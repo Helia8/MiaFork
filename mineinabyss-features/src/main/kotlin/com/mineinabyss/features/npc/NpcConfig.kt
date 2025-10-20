@@ -1,8 +1,16 @@
 package com.mineinabyss.features.npc
 
+import com.mineinabyss.components.editPlayerData
+import com.mineinabyss.components.gondolas.Ticket
+import com.mineinabyss.features.gondolas.pass.TicketConfigHolder
+import com.mineinabyss.features.gondolas.pass.isRouteUnlocked
+import com.mineinabyss.features.gondolas.pass.unlockRoute
 import com.mineinabyss.features.npc.NpcAction.DialogData
 import com.mineinabyss.features.npc.NpcAction.DialogueAction
 import com.mineinabyss.features.npc.shopkeeping.TradeTable
+import com.mineinabyss.idofront.messaging.error
+import com.mineinabyss.idofront.messaging.idofrontLogger
+import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.serialization.LocationSerializer
 import kotlinx.serialization.Serializable
 import org.bukkit.Bukkit
@@ -29,7 +37,7 @@ data class Npc(
     fun defaultInteraction(player: Player, dialogId: String, dialogData: DialogData) {
         when (type) {
             "trader" -> traderInteraction(player)
-            "gondola_unlocker" -> gondolaUnlockerInteraction()
+            "gondola_unlocker" -> dialogInteraction(player, dialogId, dialogData)
             "quest_giver" -> questGiverInteraction()
             "dialogue" -> dialogInteraction(player, dialogId, dialogData)
             else -> throw IllegalArgumentException("Unknown NPC type: $type")
@@ -39,7 +47,7 @@ data class Npc(
     fun fallbackInteraction(player: Player) {
         when (type) {
             "trader" -> traderInteraction(player)
-            "gondola_unlocker" -> gondolaUnlockerInteraction()
+            "gondola_unlocker" -> gondolaUnlockerInteraction(player)
             "quest_giver" -> questGiverInteraction()
             "dialogue" -> player.sendMessage("dialog data missing")
             else -> throw IllegalArgumentException("Unknown NPC type: $type")
@@ -60,9 +68,21 @@ data class Npc(
     }
 
 
-    fun gondolaUnlockerInteraction() {
-        // just a matter of gondola.unlockroute(ticket_id) most likely
-
+    fun gondolaUnlockerInteraction(player: Player) {
+        ticket_id ?: return idofrontLogger.e{"Ticket id is null for gondola unlocker NPC $id"}
+        val ticket: Ticket = TicketConfigHolder.config?.tickets?.get(ticket_id)
+            ?: return idofrontLogger.e("Ticket with id $ticket_id not found")
+        player.editPlayerData {
+            when {
+                player.isRouteUnlocked(ticket) -> player.error("You already own this ticket!")
+                ticket.ticketPrice > orthCoinsHeld -> player.error("You do not have enough orth coins to purchase this ticket. (Price: ${ticket.ticketPrice}, You have: $orthCoinsHeld)")
+                else -> {
+                    orthCoinsHeld -= ticket.ticketPrice
+                    player.unlockRoute(ticket)
+                    player.success("Obtained the ${ticket.ticketName} ticket")
+                }
+            }
+        }
     }
     fun questGiverInteraction() {
         // this one is a bit more finicky, tho I think i'll do something like:
