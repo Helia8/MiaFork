@@ -18,9 +18,16 @@ allprojects {
         maven("https://repo.mineinabyss.com/mirror")
         maven("https://repo.papermc.io/repository/maven-public/")
         mavenLocal()
+
+        // LuxDialogues
+        maven {
+            name = "aselstudiosRepository"
+            url = uri("https://repo.aselstudios.com/releases")
+        }
     }
 
     dependencies {
+
         val idofrontLibs = rootProject.idofrontLibs
         val libs = rootProject.libs
 
@@ -65,6 +72,10 @@ allprojects {
         compileOnly(libs.minecraft.plugin.tccoasters)
         compileOnly(libs.minecraft.plugin.mythichud)
         compileOnly(libs.minecraft.plugin.shopkeepers)
+
+        // LuxDialogue
+        compileOnly("org.aselstudios:LuxDialoguesAPI:2.0.6")
+
     }
 }
 

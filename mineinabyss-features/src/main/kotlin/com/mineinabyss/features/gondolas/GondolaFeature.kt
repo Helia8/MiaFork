@@ -3,6 +3,7 @@ package com.mineinabyss.features.gondolas
 import com.mineinabyss.components.gondolas.UnlockedGondolas
 import com.mineinabyss.features.abyss
 import com.mineinabyss.features.gondolas.pass.TicketConfig
+import com.mineinabyss.features.gondolas.pass.TicketConfigHolder
 import com.mineinabyss.features.gondolas.pass.unlockRoute
 import com.mineinabyss.geary.papermc.gearyPaper
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
@@ -37,6 +38,8 @@ class GondolaFeature : FeatureWithContext<GondolaFeature.Context>(::Context) {
         //LoadedGondolas
         //createGondolaTracker()
         plugin.listeners(context.gondolasListener)
+        context.gondolasListener.startCooldownDisplayTask(plugin)
+        TicketConfigHolder.config = context.ticketsCfg
         mainCommand {
             "gondola"(desc = "Commands for gondolas") {
                 permission = "mineinabyss.gondola"

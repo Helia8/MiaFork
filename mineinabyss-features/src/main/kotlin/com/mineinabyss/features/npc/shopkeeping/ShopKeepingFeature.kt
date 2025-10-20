@@ -1,22 +1,44 @@
 package com.mineinabyss.features.npc.shopkeeping
 
 import com.mineinabyss.components.npc.shopkeeping.ShopKeeper
+import com.mineinabyss.features.abyss
+import com.mineinabyss.features.gondolas.GondolaFeature
+import com.mineinabyss.features.gondolas.GondolaFeature.Context
+import com.mineinabyss.features.npc.NpcAction.DialogsConfig
+import com.mineinabyss.features.npc.NpcManager
+import com.mineinabyss.features.npc.NpcsConfig
 import com.mineinabyss.features.npc.shopkeeping.menu.ShopMainMenu
+import com.mineinabyss.geary.papermc.gearyPaper
 import com.mineinabyss.geary.papermc.toEntityOrNull
 import com.mineinabyss.geary.papermc.withGeary
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.guiy.canvas.guiy
 import com.mineinabyss.idofront.commands.arguments.optionArg
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
+import com.mineinabyss.idofront.config.IdofrontConfig
+import com.mineinabyss.idofront.features.Configurable
 import com.mineinabyss.idofront.features.Feature
 import com.mineinabyss.idofront.features.FeatureDSL
+import com.mineinabyss.idofront.features.FeatureWithContext
 import com.mineinabyss.idofront.plugin.listeners
+import com.ticxo.modelengine.api.utils.config.ConfigManager
+import com.mineinabyss.idofront.config.config
+import org.bukkit.Bukkit.getWorld
 
-class ShopKeepingFeature : Feature() {
+class ShopKeepingFeature : FeatureWithContext<ShopKeepingFeature.Context>(::Context) {
 
-    override fun FeatureDSL.enable() {
+    class Context : Configurable<NpcsConfig> {
+        override val configManager: IdofrontConfig<NpcsConfig> = config("npc", abyss.dataPath, NpcsConfig())
+        val npcconfig by  config("npc", abyss.dataPath, NpcsConfig())
+        val dialogsConfig by config("dialogs", abyss.dataPath, DialogsConfig())
+    }
+    override fun FeatureDSL.enable() = gearyPaper.run {
+        println("Enabling Shopkeeping Feature")
         plugin.listeners(ShopKeepingListener())
-
+        val manager = NpcManager(context.npcconfig, getWorld("world")!!, context.dialogsConfig)
+        manager.initNpc()
+        plugin.listeners(manager)
+        println("Shopkeeping Feature Enabled")
         mainCommand {
             "shops" {
                 val shopKey by optionArg(options = ShopKeepers.getKeys().map { it.toString() }) {

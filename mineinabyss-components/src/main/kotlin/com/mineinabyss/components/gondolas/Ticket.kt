@@ -15,4 +15,5 @@ class Ticket (
     val gondolasInRoute: List<String>, // IDs of the gondolas in the route
     val ticketName: String, // Name of the ticket
     val ticketPrice: Int,
+    val consumeWhenUsed: Boolean = false,
 )
