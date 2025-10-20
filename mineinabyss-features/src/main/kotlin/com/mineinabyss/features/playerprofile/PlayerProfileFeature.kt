@@ -5,7 +5,7 @@ import com.mineinabyss.features.abyss
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.geary.serialization.getOrSetPersisting
 import com.mineinabyss.geary.serialization.setPersisting
-import com.mineinabyss.guiy.inventory.guiy
+import com.mineinabyss.guiy.canvas.guiy
 import com.mineinabyss.idofront.commands.arguments.genericArg
 import com.mineinabyss.idofront.commands.arguments.offlinePlayerArg
 import com.mineinabyss.idofront.commands.arguments.optionArg
@@ -28,11 +28,11 @@ class PlayerProfileFeature(val config: Config) : Feature() {
         mainCommand {
             "profile"(desc = "Opens a players profile") {
                 playerAction {
-                    guiy { PlayerProfile(sender as Player, player) }
+                    guiy(player) { PlayerProfile(sender as Player, player) }
                 }
                 val offlinePlayer by offlinePlayerArg { default = sender as? Player }
                 action {
-                    guiy { PlayerProfile(sender as Player, offlinePlayer) }
+                    guiy(sender as Player) { PlayerProfile(sender as Player, offlinePlayer) }
                 }
             }
             "profile_background"(desc = "Changes the background for your Player-Profile") {

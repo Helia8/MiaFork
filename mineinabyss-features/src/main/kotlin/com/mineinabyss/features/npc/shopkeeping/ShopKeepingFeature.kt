@@ -12,7 +12,7 @@ import com.mineinabyss.geary.papermc.gearyPaper
 import com.mineinabyss.geary.papermc.toEntityOrNull
 import com.mineinabyss.geary.papermc.withGeary
 import com.mineinabyss.geary.prefabs.PrefabKey
-import com.mineinabyss.guiy.inventory.guiy
+import com.mineinabyss.guiy.canvas.guiy
 import com.mineinabyss.idofront.commands.arguments.optionArg
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.config.IdofrontConfig
@@ -47,7 +47,7 @@ class ShopKeepingFeature : FeatureWithContext<ShopKeepingFeature.Context>(::Cont
                 playerAction {
                     player.withGeary {
                         val shopKeeper = PrefabKey.of(shopKey).toEntityOrNull()?.get<ShopKeeper>() ?: return@playerAction
-                        guiy { ShopMainMenu(player, shopKeeper) }
+                        guiy(player) { ShopMainMenu(player, shopKeeper) }
                     }
                 }
             }

@@ -1,29 +1,22 @@
 package com.mineinabyss.features.gondolas
 
-import com.bergerkiller.reflection.org.bukkit.BSimplePluginManager.plugins
 import com.mineinabyss.components.gondolas.UnlockedGondolas
 import com.mineinabyss.features.abyss
 import com.mineinabyss.features.gondolas.pass.TicketConfig
 import com.mineinabyss.features.gondolas.pass.TicketConfigHolder
 import com.mineinabyss.features.gondolas.pass.unlockRoute
-import com.mineinabyss.features.okibotravel.OkiboTravelFeature
-import com.mineinabyss.features.okibotravel.OkiboTravelFeature.Context
-import com.mineinabyss.geary.modules.geary
 import com.mineinabyss.geary.papermc.gearyPaper
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.geary.serialization.getOrSetPersisting
-import com.mineinabyss.guiy.inventory.guiy
+import com.mineinabyss.guiy.canvas.guiy
 import com.mineinabyss.idofront.commands.arguments.stringArg
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
 import com.mineinabyss.idofront.config.config
 import com.mineinabyss.idofront.features.Configurable
-import com.mineinabyss.idofront.features.Feature
 import com.mineinabyss.idofront.features.FeatureDSL
 import com.mineinabyss.idofront.features.FeatureWithContext
 import com.mineinabyss.idofront.messaging.error
-import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.plugin.listeners
-import org.bukkit.entity.Player
 
 /*
  * Gondolas system:
@@ -53,7 +46,7 @@ class GondolaFeature : FeatureWithContext<GondolaFeature.Context>(::Context) {
                 "list"(desc = "Opens the gondola menu") {
                     permission = "mineinabyss.gondola.list"
                     playerAction {
-                        guiy { GondolaSelectionMenu(player) }
+                        guiy(player) { GondolaSelectionMenu(player) }
                     }
                 }
                 "unlock"(desc = "Unlocks a route for a player") {
@@ -64,7 +57,7 @@ class GondolaFeature : FeatureWithContext<GondolaFeature.Context>(::Context) {
 //                            ?: return@playerAction
 //                        gondolas.keys.add(gondola)
 //                        player.success("Unlocked $gondola")
-                        val ticket = context.ticketsCfg.tickets[passID]?: return@playerAction player.error("Ticket $passID not found")
+                        val ticket = context.ticketsCfg.tickets[passID] ?: return@playerAction player.error("Ticket $passID not found")
                         player.unlockRoute(ticket)
                     }
                 }
@@ -86,6 +79,7 @@ class GondolaFeature : FeatureWithContext<GondolaFeature.Context>(::Context) {
                     context.ticketsCfg.tickets.keys.filter { it.startsWith(args[2], true) }
                     //context.config.gondolas.keys.filter { it.startsWith(args[2], true) }
                 } else null
+
                 else -> null
             }
         }

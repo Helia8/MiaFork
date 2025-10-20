@@ -9,7 +9,9 @@ import com.mineinabyss.features.helpers.Text
 import com.mineinabyss.features.helpers.TitleItem
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.guiy.components.Item
+import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.idofront.messaging.error
@@ -20,10 +22,13 @@ import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 @Composable
-fun GuildUIScope.GuildJoinRequestScreen(from: OfflinePlayer) {
+fun GuildUIScope.GuildJoinRequestScreen(
+    from: OfflinePlayer,
+    onBack: () -> Unit,
+) = Chest(":space_-8::guild_inbox_handle_menu:", Modifier.height(5)) {
     PlayerLabel(Modifier.at(4, 0), from)
-    AcceptGuildRequestButton(Modifier.at(1, 1), from)
-    DeclineGuildRequestButton(Modifier.at(5, 1), from)
+    AcceptGuildRequestButton(Modifier.at(1, 1), from, onBack)
+    DeclineGuildRequestButton(Modifier.at(5, 1), from, onBack)
     BackButton(Modifier.at(4, 4))
 }
 
@@ -33,19 +38,23 @@ fun PlayerLabel(modifier: Modifier, newMember: OfflinePlayer) = Button(modifier 
 }
 
 @Composable
-fun GuildUIScope.AcceptGuildRequestButton(modifier: Modifier, newMember: OfflinePlayer) = Button(
+fun GuildUIScope.AcceptGuildRequestButton(
+    modifier: Modifier,
+    newMember: OfflinePlayer,
+    onBack: () -> Unit,
+) = Button(
     onClick = {
         if (player.getGuildJoinType() == GuildJoinType.INVITE) {
             player.error("Your guild is in 'INVITE-only' mode.")
             player.error("Change it to 'ANY' or 'REQUEST-only' mode to accept requests.")
             return@Button
         }
-        if (!player.addMemberToGuild(newMember))  return@Button player.error("Failed to add ${newMember.name} to guild.")
+        if (!player.addMemberToGuild(newMember)) return@Button player.error("Failed to add ${newMember.name} to guild.")
         newMember.removeGuildQueueEntries(GuildJoinType.REQUEST)
         if (player.getGuildMemberCount() < guildLevel * 5) {
             newMember.removeGuildQueueEntries(GuildJoinType.REQUEST)
         }
-        nav.back()
+        onBack()
     },
     modifier = modifier
 ) {
@@ -53,7 +62,10 @@ fun GuildUIScope.AcceptGuildRequestButton(modifier: Modifier, newMember: Offline
 }
 
 @Composable
-fun GuildUIScope.DeclineGuildRequestButton(modifier: Modifier, newMember: OfflinePlayer) = Button(
+fun GuildUIScope.DeclineGuildRequestButton(
+    modifier: Modifier, newMember: OfflinePlayer,
+    onBack: () -> Unit,
+) = Button(
     modifier = modifier,
     onClick = {
         guildName?.removeGuildQueueEntries(newMember, GuildJoinType.REQUEST)
@@ -69,21 +81,24 @@ fun GuildUIScope.DeclineGuildRequestButton(modifier: Modifier, newMember: Offlin
                 }
             }
         }
-        nav.back()
+        onBack()
         if (player.getNumberOfGuildRequests() == 0)
-            nav.back()
+            onBack()
     }
 ) {
     Text("<red>Decline GuildJoin-REQUEST".miniMsg(), modifier = Modifier.size(3, 3))
 }
 
 @Composable
-fun GuildUIScope.DeclineAllGuildRequestsButton(modifier: Modifier) = Button(
+fun GuildUIScope.DeclineAllGuildRequestsButton(
+    modifier: Modifier,
+    onBack: () -> Unit,
+) = Button(
     modifier = modifier,
     onClick = {
         player.removeGuildQueueEntries(GuildJoinType.REQUEST, true)
         player.info("<yellow><b>❌ <yellow>You denied all join-requests for your guild!")
-        nav.back()
+        onBack()
     }
 ) {
     Text("<red>Decline All Requests".miniMsg())

@@ -7,19 +7,26 @@ import com.mineinabyss.features.helpers.Text
 import com.mineinabyss.features.helpers.TitleItem
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.guiy.components.Item
+import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.idofront.messaging.error
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import org.bukkit.OfflinePlayer
+import org.bukkit.block.Chest
 
 @Composable
-fun GuildUIScope.GuildInviteScreen(owner: OfflinePlayer) {
+fun GuildUIScope.GuildInviteScreen(
+    owner: OfflinePlayer,
+    onBack: () -> Unit,
+    onNavigateHome: () -> Unit,
+) = Chest(":space_-8::guild_inbox_handle_menu:", Modifier.height(5)) {
     GuildLabel(owner, Modifier.at(4, 0))
-    AcceptGuildInviteButton(owner, Modifier.at(1, 1))
-    DeclineGuildInviteButton(owner, Modifier.at(5, 1))
+    AcceptGuildInviteButton(owner, Modifier.at(1, 1), onBack, onNavigateHome)
+    DeclineGuildInviteButton(owner, Modifier.at(5, 1), onBack, onNavigateHome)
     BackButton(Modifier.at(4, 4))
 }
 
@@ -39,11 +46,16 @@ fun GuildLabel(owner: OfflinePlayer, modifier: Modifier) = Button {
 }
 
 @Composable
-fun GuildUIScope.AcceptGuildInviteButton(owner: OfflinePlayer, modifier: Modifier) = Button(
+fun GuildUIScope.AcceptGuildInviteButton(
+    owner: OfflinePlayer,
+    modifier: Modifier,
+    onBack: () -> Unit,
+    onNavigateHome: () -> Unit,
+) = Button(
     modifier = modifier,
     onClick = {
         if (!owner.hasGuild()) {
-            nav.reset()
+            onNavigateHome()
             player.error("This guild does not exist anymore!")
             return@Button
         }
@@ -60,22 +72,27 @@ fun GuildUIScope.AcceptGuildInviteButton(owner: OfflinePlayer, modifier: Modifie
 
         if (!owner.addMemberToGuild(player)) return@Button player.error("Failed to join ${guildName}.")
         player.removeGuildQueueEntries(GuildJoinType.REQUEST)
-        nav.back()
+        onBack()
     },
 ) {
     Text("<green>Accept INVITE".miniMsg(), modifier = Modifier.size(3, 3))
 }
 
 @Composable
-fun GuildUIScope.DeclineGuildInviteButton(owner: OfflinePlayer, modifier: Modifier) = Button(
+fun GuildUIScope.DeclineGuildInviteButton(
+    owner: OfflinePlayer,
+    modifier: Modifier,
+    onBack: () -> Unit,
+    onNavigateHome: () -> Unit,
+) = Button(
     modifier = modifier,
     onClick = {
         val guildName = owner.getGuildName() ?: ""
         guildName.removeGuildQueueEntries(player, GuildJoinType.INVITE)
         if (owner.hasGuild())
             player.info("<gold><b>❌</b> <yellow>You denied the invite from </yellow><i>$guildName")
-        if (player.getNumberOfGuildRequests() > 1) nav.back()
-        else nav.reset()
+        if (player.getNumberOfGuildRequests() > 1) onBack()
+        else onNavigateHome()
     }
 ) {
     Text("<red>Decline INVITE".miniMsg(), modifier = Modifier.size(3, 3))

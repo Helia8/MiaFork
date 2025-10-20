@@ -8,29 +8,29 @@ import com.mineinabyss.features.helpers.di.Features
 import com.mineinabyss.features.helpers.ui.composables.Button
 import com.mineinabyss.guiy.components.HorizontalGrid
 import com.mineinabyss.guiy.components.Item
+import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.components.lists.NavbarPosition
 import com.mineinabyss.guiy.components.lists.Paginated
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.height
 import com.mineinabyss.guiy.modifiers.placement.absolute.at
 import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.idofront.textcomponents.miniMsg
-import io.papermc.paper.dialog.Dialog
-import io.papermc.paper.registry.data.dialog.ActionButton
-import io.papermc.paper.registry.data.dialog.DialogBase
-import io.papermc.paper.registry.data.dialog.action.DialogAction
 import io.papermc.paper.registry.data.dialog.input.DialogInput
-import io.papermc.paper.registry.data.dialog.type.DialogType
-import net.kyori.adventure.text.event.ClickCallback
 
 @Composable
-fun GuildUIScope.GuildLookupListScreen() {
+fun GuildUIScope.GuildLookupListScreen(
+    onNavigateToMemberList: () -> Unit,
+    onNavigateToLookupMembers: (guildName: String) -> Unit,
+) = Chest(":space_-8::guild_list_menu:", Modifier.height(6)) {
     var pageNum by remember { mutableStateOf(0) }
     var guildPageList by remember { mutableStateOf(displayGuildList()) }
 
     Paginated(
         guildPageList, pageNum,
-        nextButton = { NextPageButton(Modifier.at(5, 0)) { pageNum++ } },
-        previousButton = { PreviousPageButton(Modifier.at(3, 0)) { pageNum-- } },
+        onPageChange = { pageNum = it },
+        nextButton = { NextPageButton(Modifier.at(5, 0)) },
+        previousButton = { PreviousPageButton(Modifier.at(3, 0)) },
         NavbarPosition.BOTTOM, null
     ) { pageItems ->
         HorizontalGrid(Modifier.at(1, 0).size(7, 5)) {
@@ -39,9 +39,9 @@ fun GuildUIScope.GuildLookupListScreen() {
                 Button(
                     onClick = {
                         if (player.hasGuild() && player.getGuildName().equals(guildName, true))
-                            nav.open(GuildScreen.MemberList(guildLevel, player))
+                            onNavigateToMemberList()
                         else
-                            nav.open(GuildScreen.GuildLookupMembers(guildName))
+                            onNavigateToLookupMembers(guildName)
 
                     }) {
                     Item(
@@ -59,7 +59,7 @@ fun GuildUIScope.GuildLookupListScreen() {
         }
     }
 
-    LookForGuildButton(Modifier.at(7,5)) { text ->
+    LookForGuildButton(Modifier.at(7, 5)) { text ->
         pageNum = 0
         guildPageList = displayGuildList(text)
     }
@@ -67,21 +67,18 @@ fun GuildUIScope.GuildLookupListScreen() {
 }
 
 @Composable
-fun PreviousPageButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun PreviousPageButton(modifier: Modifier = Modifier) {
     Button(
         modifier = modifier,
-        onClick = onClick
     ) { Text("<yellow><b>Previous".miniMsg()) }
 }
 
 @Composable
 fun NextPageButton(
     modifier: Modifier,
-    onClick: () -> Unit
 ) {
     Button(
         modifier = modifier,
-        onClick = onClick
     ) { Text("<yellow><b>Next".miniMsg()) }
 }
 
@@ -91,12 +88,14 @@ fun GuildUIScope.LookForGuildButton(modifier: Modifier, onClick: (String) -> Uni
         modifier = modifier.at(7, 5),
         onClick = {
             val maxGuildLength = Features.guilds.config.guildNameMaxLength
-            val dialog = GuildDialogs(":space_-28::guild_search_menu:", "<gold>Search for Guild...", listOf(
-                DialogInput.text("guild_dialog", "<gold>Search for guilds with name...".miniMsg())
-                    .initial("Guild Name").width(maxGuildLength * 10)
-                    .maxLength(maxGuildLength)
-                    .build()
-            )).createGuildLookDialog(onClick)
+            val dialog = GuildDialogs(
+                ":space_-28::guild_search_menu:", "<gold>Search for Guild...", listOf(
+                    DialogInput.text("guild_dialog", "<gold>Search for guilds with name...".miniMsg())
+                        .initial("Guild Name").width(maxGuildLength * 10)
+                        .maxLength(maxGuildLength)
+                        .build()
+                )
+            ).createGuildLookDialog(onClick)
 
             player.showDialog(dialog)
         }
