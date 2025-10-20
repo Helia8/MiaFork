@@ -69,6 +69,7 @@ data class Npc(
 
 
     fun gondolaUnlockerInteraction(player: Player) {
+        // instead of printing messages in chat, we should open an error dialog instead
         ticket_id ?: return idofrontLogger.e{"Ticket id is null for gondola unlocker NPC $id"}
         val ticket: Ticket = TicketConfigHolder.config?.tickets?.get(ticket_id)
             ?: return idofrontLogger.e("Ticket with id $ticket_id not found")

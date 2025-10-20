@@ -2,6 +2,8 @@ package com.mineinabyss.features.npc.NpcAction
 
 import com.mineinabyss.features.npc.Npc
 import com.mineinabyss.idofront.messaging.error
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.EncodeDefault.Mode
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.aselstudios.luxdialoguesapi.Builders.Answer
@@ -30,8 +32,11 @@ data class DialogueAction(
 @Serializable
 class AnswerData(
     val text: String,
+    @EncodeDefault(Mode.NEVER)
     val placeholderCondition: String? = null,
+    @EncodeDefault(Mode.NEVER)
     val replyMessage: String? = null,
+    @EncodeDefault(Mode.NEVER)
     val action: DialogueAction? = null
 ) {
     val npc = null
@@ -48,7 +53,9 @@ class AnswerData(
 @Serializable
 class PageData(
     val lines: List<String> = emptyList(),
+    @EncodeDefault(Mode.NEVER)
     val preAction: String? = null,
+    @EncodeDefault(Mode.NEVER)
     val postAction: String? = null,
 ) {
 
@@ -63,27 +70,27 @@ class PageData(
 
 @Serializable
 class DialogData(
-    val typingSpeed: Int = 1,
-    val typingSound: String = "luxdialogues:luxdialogues.sounds.typing",
-    val selectionSound : String = "luxdialogues:luxdialogues.sounds.selection",
-    val range: Double = 3.0,
-    val effect: String = "Slowness",
-    val answerNumbers: Boolean = true,
-    val dialogueTextColor: String = "#4f4a3e",
-    val backgroundFog: Boolean = true,
-    val characterName : String = "default name",
-    val characterNameColor: String = "#4f4a3e",
-    val characterImage: String = "character-background",
-    val nameStartImage: String = "name-start",
-    val nameMidImage: String = "name-mid",
-    val nameEndImage: String = "name-end",
-    val answerBackgroundImage: String = "answer-background",
-    val dialogueBackgroundImage: String = "dialogue-background",
-    val dialogBackgroundImageColor: String = "#f8ffe0",
-    val answerBackgroundImageColor: String = "#f8ffe0",
-    val cursorIconImage: String = "hand",
-    val answers: List<AnswerData> = emptyList(),
-    val pages: List<PageData> = emptyList(),
+    @EncodeDefault(Mode.NEVER) val typingSpeed: Int = 1,
+    @EncodeDefault(Mode.NEVER) val typingSound: String = "luxdialogues:luxdialogues.sounds.typing",
+    @EncodeDefault(Mode.NEVER) val selectionSound : String = "luxdialogues:luxdialogues.sounds.selection",
+    @EncodeDefault(Mode.NEVER) val range: Double = 3.0,
+    @EncodeDefault(Mode.NEVER) val effect: String = "Slowness",
+    @EncodeDefault(Mode.NEVER) val answerNumbers: Boolean = true,
+    @EncodeDefault(Mode.NEVER) val dialogueTextColor: String = "#4f4a3e",
+    @EncodeDefault(Mode.NEVER) val backgroundFog: Boolean = true,
+    @EncodeDefault(Mode.NEVER) val characterName : String = "default name",
+    @EncodeDefault(Mode.NEVER) val characterNameColor: String = "#4f4a3e",
+    @EncodeDefault(Mode.NEVER) val characterImage: String = "character-background",
+    @EncodeDefault(Mode.NEVER) val nameStartImage: String = "name-start",
+    @EncodeDefault(Mode.NEVER) val nameMidImage: String = "name-mid",
+    @EncodeDefault(Mode.NEVER) val nameEndImage: String = "name-end",
+    @EncodeDefault(Mode.NEVER) val answerBackgroundImage: String = "answer-background",
+    @EncodeDefault(Mode.NEVER) val dialogueBackgroundImage: String = "dialogue-background",
+    @EncodeDefault(Mode.NEVER) val dialogBackgroundImageColor: String = "#f8ffe0",
+    @EncodeDefault(Mode.NEVER) val answerBackgroundImageColor: String = "#f8ffe0",
+    @EncodeDefault(Mode.NEVER) val cursorIconImage: String = "hand",
+    @EncodeDefault(Mode.NEVER) val answers: List<AnswerData> = emptyList(),
+    @EncodeDefault(Mode.NEVER) val pages: List<PageData> = emptyList(),
 ) {
 
     fun build(id: String, npc: Npc): Dialogue? {
