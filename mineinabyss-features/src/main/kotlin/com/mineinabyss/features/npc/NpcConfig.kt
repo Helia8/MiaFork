@@ -19,7 +19,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.MenuType
 
 @Serializable
-data class Npc(
+class Npc(
     val id: String,
     val displayName: String,
     val location: @Serializable(LocationSerializer::class) Location,
