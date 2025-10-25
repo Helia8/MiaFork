@@ -30,6 +30,7 @@ data class Npc(
     val type: String, // "trader", "gondola_unlocker", "quest_giver", "dialogue"
     val dialogId: String? = null,
     val ticket_id: String? = null,
+    val questId : String? = null,
 ) {
 
 
