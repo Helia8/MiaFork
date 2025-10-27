@@ -79,6 +79,7 @@ class QuestFeature : FeatureWithContext<QuestFeature.Context>(::Context) {
                 "reset"(desc = "Resets all quests for a player") {
                     permission = "mineinabyss.quests.reset"
                     playerAction {
+                        context.questManager.completeQuest(...)
                         val playerActiveQuests = player.toGearyOrNull()?.get<PlayerActiveQuests>()
                             ?: return@playerAction player.error("Could not reset quests: PlayerActiveQuests component not found")
                         playerActiveQuests.activeQuests.clear()
