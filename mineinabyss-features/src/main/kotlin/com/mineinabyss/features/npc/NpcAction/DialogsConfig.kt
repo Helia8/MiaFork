@@ -1,6 +1,8 @@
 package com.mineinabyss.features.npc.NpcAction
 
 import com.mineinabyss.features.npc.Npc
+import com.mineinabyss.features.quests.completeQuest
+import com.mineinabyss.features.quests.unlockQuest
 import com.mineinabyss.idofront.messaging.error
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.EncodeDefault.Mode
@@ -15,15 +17,33 @@ import org.bukkit.entity.Player
 @Serializable
 data class DialogueAction(
     val name: String,
+    val questId: String? = null
 ) {
     fun customAction(player: Player) {
         player.sendMessage("Custom action executed!")
     }
 
+    fun unlockQuestAction(player: Player) {
+        if (questId == null) {
+            player.error("Missing questId")
+            return
+        }
+        unlockQuest(player, questId)
+    }
+
+    fun completeQuestAction(player: Player) {
+        if (questId == null) {
+            player.error("Missing questId")
+            return
+        }
+        completeQuest(player, questId)
+    }
     fun execute(player: Player, npc: Npc) {
         when (name) {
             "customAction" -> customAction(player)
             "gondolaAction" -> npc.gondolaUnlockerInteraction(player)
+            "unlockQuestAction" -> unlockQuestAction(player)
+            "completeQuestAction" -> completeQuestAction(player)
             else -> player.error("Error resolving action: $name")
         }
     }
