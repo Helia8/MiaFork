@@ -8,7 +8,15 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 fun unlockQuest(player: Player, questId: String) {
-    player.toGearyOrNull()?.get<PlayerActiveQuests>()?.addQuest(player, questId)
+    val config = QuestConfigHolder.config ?: error("Trying to unlock quest $questId but QuestConfig is not initialized")
+    val playerActiveQuests  = player.toGearyOrNull()?.get<PlayerActiveQuests>() ?: error("Could not unlock quest $questId: PlayerActiveQuests component not found")
+    if (questId !in config.visitQuests.keys) {
+        error("Trying to unlock quest $questId but it does not exist in the QuestConfig")
+    }
+    if (questId in playerActiveQuests.activeQuests) {
+        error("Trying to unlock quest $questId but player already has it active")
+    }
+    playerActiveQuests.addQuest(player, questId)
 }
 
 fun completeQuest(player: Player, questId: String) {
