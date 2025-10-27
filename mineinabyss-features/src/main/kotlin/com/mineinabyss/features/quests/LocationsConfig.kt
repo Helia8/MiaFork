@@ -14,7 +14,7 @@ class LocationData(
     val locationCenter: @Serializable(with = LocationSerializer::class) Location,
     val radius: Int,
 ) {
-    var visited : Boolean = false
+//    var visited : Boolean = false
     val minX = locationCenter.blockX - radius
     val maxX = locationCenter.blockX + radius
     val minY = locationCenter.blockY - radius

@@ -3,7 +3,6 @@ package com.mineinabyss.features.quests
 import com.mineinabyss.geary.papermc.toGeary
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import com.mineinabyss.geary.papermc.tracking.items.ItemTracking
-import com.mineinabyss.geary.prefabs.PrefabKey
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -33,21 +32,30 @@ fun completeQuest(player: Player, questId: String) {
     }
 }
 
-fun isVisitQuestCompleted(questId: String, config: QuestConfig): Boolean {
+fun isVisitQuestCompleted(questId: String, config: QuestConfig, playerActiveQuests: PlayerActiveQuests): Boolean {
     val visitQuest = config.visitQuests[questId] ?: return false
+    return visitQuest.locations.all { locationData ->
+        locationData.name in playerActiveQuests.visitedLocations
+    }
 
-    return visitQuest.locations.all { it.visited }
+}
+
+fun isFetchQuestCompleted(questId: String, config: QuestConfig, playerActiveQuests: PlayerActiveQuests): Boolean {
+    // Placeholder implementation
+    return false
+}
+
+fun isKillQuestCompleted(questId: String, config: QuestConfig, playerActiveQuests: PlayerActiveQuests): Boolean {
+    // Placeholder implementation
+    return false
 }
 
 fun isQuestCompleted(player: Player, questId: String): Boolean {
     val config = QuestConfigHolder.config ?: error("Trying to check completion of quest $questId but QuestConfig is not initialized")
     val playerActiveQuests = player.toGearyOrNull()?.get<PlayerActiveQuests>() ?: return false
     val activeQuests = playerActiveQuests.activeQuests
-    val visitQuest = config.visitQuests[questId] ?: return false
     if (questId !in activeQuests) return false
+    return isVisitQuestCompleted(questId, config, playerActiveQuests) || isKillQuestCompleted(questId, config, playerActiveQuests) || isFetchQuestCompleted(questId, config, playerActiveQuests)
 
 
-    return visitQuest.locations.all { locationData ->
-        locationData.name in playerActiveQuests.visitedLocations
-    }
 }
