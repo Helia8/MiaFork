@@ -15,9 +15,17 @@ class QuestListener(
         if (!this.hasExplicitlyChangedBlock()) {
             return
         }
-        val activeQuests = player.toGearyOrNull()?.get<PlayerActiveQuests>()?: return
-
+       val activeQuests = player.toGearyOrNull()?.get<PlayerActiveQuests>()?: return
         // get player active quests
+
+
+//        activeQuests.activeVisitQuests.forEach { visitQuest ->
+//            visitQuest.locations.forEach { location ->
+//                if (!location.visited && location.isInside(to)) {
+//                    location.visited = true
+//                }
+//            }
+//        }
         questConfig.visitQuests.forEach { quest ->
             if (!activeQuests.activeQuests.contains(quest.key)) return@forEach
             // there are probably some spacial partitioning tricks to do here at some point
@@ -25,8 +33,8 @@ class QuestListener(
             // so it's only ever 600 checks per move event which is at most 3600 integer comparisons if all 40 players manage to move at 1 block per tick
             // tldr: i'll optimize it later
             quest.value.locations.forEach { location ->
-                if (!location.visited && location.isInside(to)) {
-                    location.visited = true
+                if (location.name !in activeQuests.visitedLocations && location.isInside(to)) {
+                    activeQuests.visitedLocations.add(location.name)
                 }
             }
         }

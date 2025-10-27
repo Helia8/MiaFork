@@ -9,9 +9,10 @@ import com.mineinabyss.idofront.features.FeatureDSL
 class QuestFeature : FeatureWithContext<QuestFeature.Context>(::Context) {
     class Context: Configurable<QuestConfig> {
         override val configManager = config("quests", abyss.dataPath, QuestConfig())
+        val questConfig by config("quests", abyss.dataPath, QuestConfig())
     }
 
     override fun FeatureDSL.enable() {
-       //
+        QuestConfigHolder.config = context.questConfig
     }
 }

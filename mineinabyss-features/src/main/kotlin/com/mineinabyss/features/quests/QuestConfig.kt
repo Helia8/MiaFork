@@ -7,13 +7,12 @@ import kotlinx.serialization.Serializable
 import org.bukkit.Location
 
 @Serializable
-class VisitQuest(
+data class VisitQuest(
     val questId: String,
     val locations: List<LocationData>,
     val gearyRewards: Map<PrefabKey, Int>,
     val vanillaRewards: Map<String, Int>,
 ) {
-
 
 }
 
