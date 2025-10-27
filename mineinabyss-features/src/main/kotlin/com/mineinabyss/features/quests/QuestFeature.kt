@@ -1,6 +1,9 @@
 package com.mineinabyss.features.quests
 
 import com.mineinabyss.features.abyss
+import com.mineinabyss.geary.actions.ActionGroupContext
+import com.mineinabyss.geary.actions.execute
+import com.mineinabyss.geary.papermc.features.common.actions.DropItemsAction
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import com.mineinabyss.idofront.commands.arguments.stringArg
 import com.mineinabyss.idofront.commands.extensions.actions.playerAction
@@ -11,16 +14,42 @@ import com.mineinabyss.idofront.features.FeatureWithContext
 import com.mineinabyss.idofront.messaging.error
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.plugin.listeners
+import me.dvyy.sqlite.Database
+import me.dvyy.sqlite.tables.Table
 
 class QuestFeature : FeatureWithContext<QuestFeature.Context>(::Context) {
     class Context : Configurable<QuestConfig> {
         override val configManager = config("quests", abyss.dataPath, QuestConfig())
         val questConfig by config("quests", abyss.dataPath, QuestConfig())
+//        val database = Database(abyss.dataPath.resolve("quests.db").toString()) {
+//            Table( """
+//
+//            """.trimIndent())
+//
+////            // Initialize tables if they don't exist
+////            execute(
+////                """
+////                CREATE TABLE IF NOT EXISTS player_quests (
+////                    player_uuid TEXT,
+////                    quest_id TEXT,
+////                    status TEXT,
+////                    progress INTEGER,
+////                    PRIMARY KEY (player_uuid, quest_id)
+////                );
+////                """.trimIndent()
+////            )
+        }
     }
 
     override fun FeatureDSL.enable() {
         QuestConfigHolder.config = context.questConfig
         plugin.listeners(QuestListener(context.questConfig))
+
+//        val player: Player = ////
+//        val act = ActionGroupContext().apply { entity = player}
+//        DropItemsAction(emptyList()).execute(act)
+
+
 
         mainCommand {
             "quests"(desc = "Commands for quests") {

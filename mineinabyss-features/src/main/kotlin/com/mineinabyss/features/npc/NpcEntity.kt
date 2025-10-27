@@ -10,6 +10,7 @@ import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import com.mineinabyss.geary.papermc.tracking.items.ItemTracking
 import com.mineinabyss.geary.prefabs.PrefabKey
 import com.mineinabyss.idofront.messaging.info
+import com.ticxo.modelengine.api.ModelEngineAPI
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.entity.Interaction
@@ -43,6 +44,10 @@ class NpcEntity(
         }
 
         val entity = location.world.spawn(location, Interaction::class.java)
+        val modeledEntity = ModelEngineAPI.createModeledEntity(entity)
+        val activeModel = ModelEngineAPI.createActiveModel(config.bbModel)
+        modeledEntity.addModel(activeModel, true)
+
         entity.addScoreboardTag(config.id)
         entity.customName = config.displayName
         entity.isCustomNameVisible = true

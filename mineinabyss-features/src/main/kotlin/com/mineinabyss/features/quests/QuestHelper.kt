@@ -19,33 +19,33 @@ fun unlockQuest(player: Player, questId: String) {
     playerActiveQuests.addQuest(player, questId)
 }
 
-fun completeQuest(player: Player, questId: String) {
-    val config = QuestConfigHolder.config ?: error("Trying to complete quest $questId but QuestConfig is not initialized")
-    player.toGearyOrNull()?.get<PlayerActiveQuests>()?.completeQuest(player, questId)
-    val gearyRewards = config.visitQuests[questId]?.gearyRewards
-    if (gearyRewards != null) {
-        for ((item, amount) in gearyRewards) {
-            val gearyItems = player.world.toGeary().getAddon(ItemTracking)
-            val gearyItem = gearyItems.createItem(item) ?: error("Failed to complete quest $questId: Geary prefab $item not found")
-            gearyItem.amount = amount.coerceIn(1, gearyItem.maxStackSize)
-            player.inventory.addItem(gearyItem)
-        }
-    }
-    val vanillaRewards = config.visitQuests[questId]?.vanillaRewards ?: return
-    for ((itemName, amount) in vanillaRewards) {
-        val material = Material.matchMaterial(itemName) ?: error("Failed to complete quest $questId: Material $itemName not found")
-        val itemStack = ItemStack(material)
-        itemStack.amount = amount.coerceIn(1, itemStack.maxStackSize)
-        player.inventory.addItem(itemStack)
-    }
-}
+//fun completeQuest(player: Player, questId: String) {
+//    val config = QuestConfigHolder.config ?: error("Trying to complete quest $questId but QuestConfig is not initialized")
+//    player.toGearyOrNull()?.get<PlayerActiveQuests>()?.completeQuest(player, questId)
+//    val gearyRewards = config.visitQuests[questId]?.gearyRewards
+//    if (gearyRewards != null) {
+//        for ((item, amount) in gearyRewards) {
+//            val gearyItems = player.world.toGeary().getAddon(ItemTracking)
+//            val gearyItem = gearyItems.createItem(item) ?: error("Failed to complete quest $questId: Geary prefab $item not found")
+//            gearyItem.amount = amount.coerceIn(1, gearyItem.maxStackSize)
+//            player.inventory.addItem(gearyItem)
+//        }
+//    }
+//    val vanillaRewards = config.visitQuests[questId]?.vanillaRewards ?: return
+//    for ((itemName, amount) in vanillaRewards) {
+//        val material = Material.matchMaterial(itemName) ?: error("Failed to complete quest $questId: Material $itemName not found")
+//        val itemStack = ItemStack(material)
+//        itemStack.amount = amount.coerceIn(1, itemStack.maxStackSize)
+//        player.inventory.addItem(itemStack)
+//    }
+//}
 
-fun isVisitQuestCompleted(questId: String, config: QuestConfig, playerActiveQuests: PlayerActiveQuests): Boolean {
-    val visitQuest = config.visitQuests[questId] ?: return false
+fun isVisitQuestCompleted(questId: String, config: QuestConfig, player: Player): Boolean {
+    val visitQuest = config.visitQuests[questId] ?: return
+
     return visitQuest.locations.all { locationData ->
         locationData.name in playerActiveQuests.visitedLocations
     }
-
 }
 
 fun isFetchQuestCompleted(questId: String, config: QuestConfig, playerActiveQuests: PlayerActiveQuests): Boolean {
