@@ -8,12 +8,12 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 fun unlockQuest(player: Player, questId: String) {
-    player.toGearyOrNull()?.get<PlayerActiveQuests>()?.activeQuests?.add(questId)
+    player.toGearyOrNull()?.get<PlayerActiveQuests>()?.addQuest(player, questId)
 }
 
 fun completeQuest(player: Player, questId: String) {
     val config = QuestConfigHolder.config ?: error("Trying to complete quest $questId but QuestConfig is not initialized")
-    player.toGearyOrNull()?.get<PlayerActiveQuests>()?.activeQuests?.remove(questId)
+    player.toGearyOrNull()?.get<PlayerActiveQuests>()?.completeQuest(player, questId)
     val gearyRewards = config.visitQuests[questId]?.gearyRewards
     if (gearyRewards != null) {
         for ((item, amount) in gearyRewards) {
@@ -56,6 +56,19 @@ fun isQuestCompleted(player: Player, questId: String): Boolean {
     val activeQuests = playerActiveQuests.activeQuests
     if (questId !in activeQuests) return false
     return isVisitQuestCompleted(questId, config, playerActiveQuests) || isKillQuestCompleted(questId, config, playerActiveQuests) || isFetchQuestCompleted(questId, config, playerActiveQuests)
+}
 
+fun checkAndCompleteQuest(player: Player, questId: String) {
+    if (isQuestCompleted(player, questId)) {
+        completeQuest(player, questId)
+    }
+}
 
+fun getVisitQuestProgress(questId: String, config: QuestConfig, playerActiveQuests: PlayerActiveQuests): Pair<Int, Int> {
+    val visitQuest = config.visitQuests[questId] ?: return 0 to 0
+    val totalLocations = visitQuest.locations.size
+    val visitedLocations = visitQuest.locations.count { locationData ->
+        locationData.name in playerActiveQuests.visitedLocations
+    }
+    return visitedLocations to totalLocations
 }

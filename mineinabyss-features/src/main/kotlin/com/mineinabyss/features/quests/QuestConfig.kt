@@ -28,8 +28,8 @@ class KillQuest {
 @Serializable
 class QuestConfig(
     val visitQuests: Map<String, VisitQuest> = emptyMap(), // <QuestID, VisitQuest>
-    val fetchQuests: List<FetchQuest> = emptyList(),
-    val killQuests: List<KillQuest> = emptyList(),
+    val fetchQuests: Map<String, FetchQuest> = emptyMap(),
+    val killQuests: Map<String,KillQuest> = emptyMap(),
 ) {
 
 }
