@@ -3,6 +3,7 @@ package com.mineinabyss.features.npc
 import com.mineinabyss.features.abyss
 import com.mineinabyss.features.npc.NpcAction.DialogData
 import com.mineinabyss.features.npc.NpcAction.DialogsConfig
+import com.mineinabyss.features.npc.NpcAction.QuestDialogData
 import com.mineinabyss.features.npc.shopkeeping.Trade
 import com.mineinabyss.geary.papermc.toGeary
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
@@ -23,7 +24,8 @@ class NpcEntity(
     val config: Npc,
     val mainWorld: World,
     dialogsConfig: DialogsConfig,
-    val dialogData: DialogData? = dialogsConfig.configs[config.dialogId]
+    val dialogData: DialogData? = dialogsConfig.configs[config.dialogId],
+    val questDialog: DialogData? = dialogsConfig.configs[config.questEndId]
 ) {
 
     fun createBaseNpc() {
@@ -53,6 +55,9 @@ class NpcEntity(
             println("dialogg data set")
         } else {
             println("couldnt set dialog data for npc ${config.id}")
+        }
+        if (questDialog != null) {
+            gearyEntity.set<QuestDialogData>(QuestDialogData(questDialog))
         }
 
     }

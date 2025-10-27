@@ -2,6 +2,7 @@ package com.mineinabyss.features.npc
 
 import com.mineinabyss.features.npc.NpcAction.DialogData
 import com.mineinabyss.features.npc.NpcAction.DialogsConfig
+import com.mineinabyss.features.npc.NpcAction.QuestDialogData
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import org.bukkit.World
 import org.bukkit.event.EventHandler
@@ -70,11 +71,12 @@ class NpcManager(
 //            return
 //        }
         val dialogData = gearyEntity.get<DialogData>()
+        val questDialogData = gearyEntity.get<QuestDialogData>()
         if (dialogData == null) {
             player.sendMessage("dialog data missing for npc ${NpcData.id}")
         }
         if (dialogId != null && dialogData != null) {
-            NpcData.defaultInteraction(player, dialogId, dialogData)
+            NpcData.defaultInteraction(player, dialogId, dialogData, questDialogData)
         } else {
             if (dialogId != null) {
                 player.sendMessage("This NPC is missing dialog data for ID: $dialogId")

@@ -80,3 +80,13 @@ fun getVisitQuestProgress(questId: String, config: QuestConfig, playerActiveQues
     }
     return visitedLocations to totalLocations
 }
+
+fun Player.hasUnlockedQuest(questId: String): Boolean {
+    val playerActiveQuests = this.toGearyOrNull()?.get<PlayerActiveQuests>() ?: return false
+    return questId in playerActiveQuests.activeQuests
+}
+
+fun Player.hasCompletedQuest(questId: String): Boolean {
+    val playerActiveQuests = this.toGearyOrNull()?.get<PlayerActiveQuests>() ?: return false
+    return questId in playerActiveQuests.completedQuests
+}

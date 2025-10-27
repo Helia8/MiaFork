@@ -23,27 +23,13 @@ data class DialogueAction(
         player.sendMessage("Custom action executed!")
     }
 
-    fun unlockQuestAction(player: Player) {
-        if (questId == null) {
-            player.error("Missing questId")
-            return
-        }
-        unlockQuest(player, questId)
-    }
 
-    fun completeQuestAction(player: Player) {
-        if (questId == null) {
-            player.error("Missing questId")
-            return
-        }
-        completeQuest(player, questId)
-    }
     fun execute(player: Player, npc: Npc) {
         when (name) {
             "customAction" -> customAction(player)
             "gondolaAction" -> npc.gondolaUnlockerInteraction(player)
-            "unlockQuestAction" -> unlockQuestAction(player)
-            "completeQuestAction" -> completeQuestAction(player)
+            "unlockQuestAction" -> npc.questUnlockInteraction(player)
+            "completeQuestAction" -> npc.questCompleteInteraction(player)
             else -> player.error("Error resolving action: $name")
         }
     }
@@ -148,6 +134,11 @@ class DialogData(
         LuxDialoguesAPI.getProvider().sendDialogue(player, dialog)
     }
 }
+
+@Serializable
+data class QuestDialogData(
+    val dialogData: DialogData,
+)
 
 @Serializable
 class DialogsConfig(
