@@ -80,5 +80,15 @@ class QuestFeature : FeatureWithContext<QuestFeature.Context>(::Context) {
                 }
             }
         }
+        tabCompletion {
+            when (args.size) {
+                1 -> listOf("quests").filter { it.startsWith(args[0], true) }
+                2 -> if (args[0] == "quests") listOf("unlock", "complete", "reset", "getProgressStatus").filter { it.startsWith(args[1], true) } else null
+                3 -> if (args[0] == "quests" && args[1] in listOf("unlock", "complete", "getProgressStatus")) {
+                    context.questConfig.visitQuests.keys.filter { it.startsWith(args[2], true) }
+                } else null
+                else -> null
+            }
+        }
     }
 }
