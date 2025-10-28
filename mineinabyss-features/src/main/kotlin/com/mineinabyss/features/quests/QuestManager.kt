@@ -54,15 +54,11 @@ object QuestManager {
     fun addVisitedLocation(player: Player, locationName: String) {
         update(player) { data -> data.copy(visitedLocations = data.visitedLocations + locationName) }
     }
-
-
     // hopefully this auto save the changes on the player
-    context(config: QuestConfig)
     fun addQuest(player: Player, questId: String) {
         update(player) { data -> data.copy(activeQuests = data.activeQuests + questId) }
     }
 
-    context(config: QuestConfig)
     fun completeQuest(player: Player, questId: String) {
         update(player) { data ->
             data.copy(
@@ -75,9 +71,8 @@ object QuestManager {
         giveQuestReward(player, questId)
     }
 
-    context(config: QuestConfig)
     fun giveQuestReward(player: Player, questId: String) {
-        //val config = QuestConfigHolder.config ?: error("Trying to complete quest $questId but QuestConfig is not initialized")
+        val config = QuestConfigHolder.config ?: error("Trying to complete quest $questId but QuestConfig is not initialized")
         val gearyRewards = config.visitQuests[questId]?.gearyRewards
         if (gearyRewards != null) {
             for ((item, amount) in gearyRewards) {
@@ -96,9 +91,8 @@ object QuestManager {
         }
     }
 
-    context(config: QuestConfig)
     fun unlockQuest(player: Player, questId: String) {
-        //val config = QuestConfigHolder.config ?: error("Trying to unlock quest $questId but QuestConfig is not initialized")
+        val config = QuestConfigHolder.config ?: error("Trying to unlock quest $questId but QuestConfig is not initialized")
         if (questId !in config.visitQuests.keys) {
             error("Trying to unlock quest $questId but it does not exist in the QuestConfig")
         }
@@ -112,9 +106,8 @@ object QuestManager {
         addQuest(player, questId)
     }
 
-    context(config: QuestConfig)
     fun getVisitQuestProgress(player: Player, questId: String): Pair<Int, Int> {
-        //val config = QuestConfigHolder.config ?: error("Trying to get progress of quest $questId but QuestConfig is not initialized")
+        val config = QuestConfigHolder.config ?: error("Trying to get progress of quest $questId but QuestConfig is not initialized")
         val visitQuest = config.visitQuests[questId] ?: error("Trying to get progress of quest $questId but it does not exist in the QuestConfig")
         val questData = getQuestData(player)
 
@@ -129,8 +122,7 @@ object QuestManager {
     }
 
 
-    context(config: QuestConfig)
-    fun isVisitQuestCompleted(questId: String, questData: QuestData): Boolean {
+    fun isVisitQuestCompleted(questId: String, config: QuestConfig, questData: QuestData): Boolean {
         val visitQuest = config.visitQuests[questId] ?: return false
 
         return visitQuest.locations.all { locationData ->
@@ -138,27 +130,25 @@ object QuestManager {
         }
     }
 
-    context(config: QuestConfig)
-    fun isKillQuestCompleted(questId: String, questData: QuestData): Boolean {
+    fun isKillQuestCompleted(questId: String, config: QuestConfig, questData: QuestData): Boolean {
         // Placeholder implementation
         return false
     }
 
-    context(config: QuestConfig)
-    fun isFetchQuestCompleted(questId: String, questData: QuestData): Boolean {
+    fun isFetchQuestCompleted(questId: String, config: QuestConfig, questData: QuestData): Boolean {
         // Placeholder implementation
         return false
     }
 
-    context(config: QuestConfig)
     fun isQuestCompleted(player: Player, questId: String): Boolean {
+        val config = QuestConfigHolder.config ?: error("Trying to check completion of quest $questId but QuestConfig is not initialized")
         val questData = getQuestData(player)
         val activeQuests = questData.activeQuests
         if (questId !in activeQuests) return false
-        return isVisitQuestCompleted(questId, questData) || isKillQuestCompleted(questId, questData) || isFetchQuestCompleted(questId, questData)
+        return isVisitQuestCompleted(questId, config, questData) || isKillQuestCompleted(questId, config, questData) || isFetchQuestCompleted(questId, config, questData)
     }
 
-    context(config: QuestConfig)
+
     fun checkAndCompleteQuest(player: Player, questId: String) {
         if (isQuestCompleted(player, questId)) {
             completeQuest(player, questId)

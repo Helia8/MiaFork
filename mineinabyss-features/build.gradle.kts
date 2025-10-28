@@ -20,12 +20,7 @@ kotlin {
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             "-opt-in=kotlin.ExperimentalUnsignedTypes",
             "-Xcontext-receivers",
-            "-Xcontext-parameters"
         )
     }
 }
-
 val compileKotlin: KotlinCompile by tasks
-compileKotlin.compilerOptions {
-    freeCompilerArgs.set(listOf("-Xcontext-parameters"))
-}
