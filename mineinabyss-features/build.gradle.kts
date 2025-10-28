@@ -11,7 +11,6 @@ plugins {
 
 dependencies {
     api(project(":mineinabyss-components"))
-    compileOnly(libs.sqlite.kt)
 }
 
 kotlin {
