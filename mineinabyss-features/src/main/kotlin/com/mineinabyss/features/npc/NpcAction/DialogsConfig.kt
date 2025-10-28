@@ -1,8 +1,6 @@
 package com.mineinabyss.features.npc.NpcAction
 
 import com.mineinabyss.features.npc.Npc
-import com.mineinabyss.features.quests.completeQuest
-import com.mineinabyss.features.quests.unlockQuest
 import com.mineinabyss.geary.actions.Action
 import com.mineinabyss.geary.actions.ActionGroupContext
 import com.mineinabyss.geary.actions.Task
