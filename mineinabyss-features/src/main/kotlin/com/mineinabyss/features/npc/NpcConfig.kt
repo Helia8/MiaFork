@@ -12,10 +12,6 @@ import com.mineinabyss.features.quests.QuestManager.completeQuest
 import com.mineinabyss.features.quests.QuestManager.playerHasCompletedQuest
 import com.mineinabyss.features.quests.QuestManager.playerHasUnlockedQuest
 import com.mineinabyss.features.quests.QuestManager.unlockQuest
-import com.mineinabyss.features.quests.completeQuest
-import com.mineinabyss.features.quests.hasCompletedQuest
-import com.mineinabyss.features.quests.hasUnlockedQuest
-import com.mineinabyss.features.quests.unlockQuest
 import com.mineinabyss.idofront.messaging.error
 import com.mineinabyss.idofront.messaging.idofrontLogger
 import com.mineinabyss.idofront.messaging.info
