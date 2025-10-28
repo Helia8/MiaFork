@@ -20,8 +20,7 @@ import com.mineinabyss.idofront.features.FeatureWithContext
 import com.mineinabyss.idofront.messaging.error
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.plugin.listeners
-import me.dvyy.sqlite.Database
-import me.dvyy.sqlite.tables.Table
+
 
 class QuestFeature : FeatureWithContext<QuestFeature.Context>(::Context) {
     class Context : Configurable<QuestConfig> {
