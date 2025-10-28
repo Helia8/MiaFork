@@ -8,6 +8,10 @@ import com.mineinabyss.features.gondolas.pass.unlockRoute
 import com.mineinabyss.features.npc.NpcAction.DialogData
 import com.mineinabyss.features.npc.NpcAction.QuestDialogData
 import com.mineinabyss.features.npc.shopkeeping.TradeTable
+import com.mineinabyss.features.quests.QuestManager.completeQuest
+import com.mineinabyss.features.quests.QuestManager.playerHasCompletedQuest
+import com.mineinabyss.features.quests.QuestManager.playerHasUnlockedQuest
+import com.mineinabyss.features.quests.QuestManager.unlockQuest
 import com.mineinabyss.features.quests.completeQuest
 import com.mineinabyss.features.quests.hasCompletedQuest
 import com.mineinabyss.features.quests.hasUnlockedQuest
@@ -74,13 +78,13 @@ data class Npc(
     // Or return an error in chat if the player hasn't completed the quest yet.
     // this is really messy, and it could definitely use a "quest progress dialog" and a "quest end dialog".
     fun questGiverInteraction(player: Player, questDialogData: QuestDialogData? = null, dialogData: DialogData? = null) {
-        if (questDialogData != null && player.hasUnlockedQuest(questId ?: return)) {
+        if (questDialogData != null && playerHasUnlockedQuest(player, questId ?: return)) {
             questDialogData.dialogData.startDialogue(player, questId, this)
-        } else if (questDialogData != null && dialogData != null && !player.hasCompletedQuest(questId ?: return)) {
+        } else if (questDialogData != null && dialogData != null && !playerHasCompletedQuest(player, questId ?: return)) {
             dialogData.startDialogue(player, dialogId ?: return, this)
 //            questUnlockInteraction(player)
         }
-        if (player.hasCompletedQuest(questId ?: return)) {
+        if (playerHasCompletedQuest(player, questId ?: return)) {
             player.info("You have already completed this quest.")
             return
         }
