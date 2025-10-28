@@ -1,6 +1,12 @@
 package com.mineinabyss.features.quests
 
 import com.mineinabyss.features.abyss
+import com.mineinabyss.features.quests.QuestManager.completeQuest
+import com.mineinabyss.features.quests.QuestManager.getActiveQuests
+import com.mineinabyss.features.quests.QuestManager.getCompletedQuests
+import com.mineinabyss.features.quests.QuestManager.getVisitQuestProgress
+import com.mineinabyss.features.quests.QuestManager.resetQuests
+import com.mineinabyss.features.quests.QuestManager.unlockQuest
 import com.mineinabyss.geary.actions.ActionGroupContext
 import com.mineinabyss.geary.actions.execute
 import com.mineinabyss.geary.papermc.features.common.actions.DropItemsAction
@@ -38,7 +44,7 @@ class QuestFeature : FeatureWithContext<QuestFeature.Context>(::Context) {
 ////                );
 ////                """.trimIndent()
 ////            )
-        }
+
     }
 
     override fun FeatureDSL.enable() {
@@ -50,74 +56,75 @@ class QuestFeature : FeatureWithContext<QuestFeature.Context>(::Context) {
 //        DropItemsAction(emptyList()).execute(act)
 
 
+        with(context.config) {
+            mainCommand {
+                "quests"(desc = "Commands for quests") {
+                    permission = "mineinabyss.quests"
+                    "unlock"(desc = "Unlocks a quest for a player") {
+                        permission = "mineinabyss.quests.unlock"
+                        val questId by stringArg()
+                        playerAction {
+                            if (questId in context.questConfig.visitQuests.keys) {
 
-        mainCommand {
-            "quests"(desc = "Commands for quests") {
-                permission = "mineinabyss.quests"
-                "unlock"(desc = "Unlocks a quest for a player") {
-                    permission = "mineinabyss.quests.unlock"
-                    val questId by stringArg()
-                    playerAction {
-                        if (questId in context.questConfig.visitQuests.keys) {
-                            unlockQuest(player, questId)
-                        } else {
-                            player.error("Quest $questId not found")
+                                unlockQuest(player, questId)
+
+                            } else {
+                                player.error("Quest $questId not found")
+                            }
                         }
                     }
-                }
-                "complete"(desc = "Completes a quest for a player") {
-                    permission = "mineinabyss.quests.complete"
-                    val questId by stringArg()
-                    playerAction {
-                        if (questId in context.questConfig.visitQuests.keys) {
-                            completeQuest(player, questId)
-                        } else {
-                            player.error("Quest $questId not found")
+                    "complete"(desc = "Completes a quest for a player") {
+                        permission = "mineinabyss.quests.complete"
+                        val questId by stringArg()
+                        playerAction {
+                            if (questId in context.questConfig.visitQuests.keys) {
+                                completeQuest(player, questId)
+                            } else {
+                                player.error("Quest $questId not found")
+                            }
                         }
                     }
-                }
-                "reset"(desc = "Resets all quests for a player") {
-                    permission = "mineinabyss.quests.reset"
-                    playerAction {
-                        context.questManager.completeQuest(...)
-                        val playerActiveQuests = player.toGearyOrNull()?.get<PlayerActiveQuests>()
-                            ?: return@playerAction player.error("Could not reset quests: PlayerActiveQuests component not found")
-                        playerActiveQuests.activeQuests.clear()
-                        playerActiveQuests.visitedLocations.clear()
-                        playerActiveQuests.completedQuests.clear()
-                        player.success("All quests have been reset.")
+                    "reset"(desc = "Resets all quests for a player") {
+                        permission = "mineinabyss.quests.reset"
+                        playerAction {
+//                        context.questManager.completeQuest(...)
+                            resetQuests(player)
+                            player.success("All quests have been reset.")
+                        }
                     }
-                }
-                "getProgressStatus"(desc = "Gets the progress status of a quest for a player") {
-                    permission = "mineinabyss.quests.getProgressStatus"
-                    val questId by stringArg()
-                    playerAction {
-                        val playerActiveQuests = player.toGearyOrNull()?.get<PlayerActiveQuests>()
-                            ?: return@playerAction player.error("Could not get quest progress: PlayerActiveQuests component not found")
-                        when (questId) {
-                            in playerActiveQuests.completedQuests -> {
-                                player.success("Quest $questId is completed.")
-                            }
-                            in playerActiveQuests.activeQuests -> {
-                                val progress = getVisitQuestProgress(questId, context.questConfig, playerActiveQuests)
-                                player.success("Quest $questId is in progress. Progress: ${progress.first}/${progress.second}")
-                            }
-                            else -> {
-                                player.success("Quest $questId is not started.")
+                    "getProgressStatus"(desc = "Gets the progress status of a quest for a player") {
+                        permission = "mineinabyss.quests.getProgressStatus"
+                        val questId by stringArg()
+                        playerAction {
+
+                            when (questId) {
+                                in getCompletedQuests(player) -> {
+                                    player.success("Quest $questId is completed.")
+                                }
+
+                                in getActiveQuests(player) -> {
+                                    val progress = getVisitQuestProgress(player, questId)
+                                    player.success("Quest $questId is in progress. Progress: ${progress.first}/${progress.second}")
+                                }
+
+                                else -> {
+                                    player.success("Quest $questId is not started.")
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        tabCompletion {
-            when (args.size) {
-                1 -> listOf("quests").filter { it.startsWith(args[0], true) }
-                2 -> if (args[0] == "quests") listOf("unlock", "complete", "reset", "getProgressStatus").filter { it.startsWith(args[1], true) } else null
-                3 -> if (args[0] == "quests" && args[1] in listOf("unlock", "complete", "getProgressStatus")) {
-                    context.questConfig.visitQuests.keys.filter { it.startsWith(args[2], true) }
-                } else null
-                else -> null
+            tabCompletion {
+                when (args.size) {
+                    1 -> listOf("quests").filter { it.startsWith(args[0], true) }
+                    2 -> if (args[0] == "quests") listOf("unlock", "complete", "reset", "getProgressStatus").filter { it.startsWith(args[1], true) } else null
+                    3 -> if (args[0] == "quests" && args[1] in listOf("unlock", "complete", "getProgressStatus")) {
+                        context.questConfig.visitQuests.keys.filter { it.startsWith(args[2], true) }
+                    } else null
+
+                    else -> null
+                }
             }
         }
     }
