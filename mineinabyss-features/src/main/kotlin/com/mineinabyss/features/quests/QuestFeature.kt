@@ -48,7 +48,6 @@ class QuestFeature : FeatureWithContext<QuestFeature.Context>(::Context) {
     }
 
     override fun FeatureDSL.enable() {
-        QuestConfigHolder.config = context.questConfig
         plugin.listeners(QuestListener(context.questConfig))
 
 //        val player: Player = ////
