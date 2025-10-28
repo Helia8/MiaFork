@@ -2,7 +2,6 @@ package com.mineinabyss.features.quests
 
 import com.mineinabyss.geary.papermc.toGeary
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
-import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import com.mineinabyss.geary.papermc.tracking.items.ItemTracking
 import com.mineinabyss.geary.serialization.getOrSetPersisting
 import com.mineinabyss.geary.serialization.setPersisting
@@ -11,9 +10,6 @@ import kotlinx.serialization.Serializable
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.iterator
 
 @Serializable
 @SerialName("mineinabyss:quest_data")
@@ -54,6 +50,10 @@ object QuestManager {
         }
 
         // give quest reward to player
+        giveQuestReward(player, questId)
+    }
+
+    fun giveQuestReward(player: Player, questId: String) {
         val config = QuestConfigHolder.config ?: error("Trying to complete quest $questId but QuestConfig is not initialized")
         val gearyRewards = config.visitQuests[questId]?.gearyRewards
         if (gearyRewards != null) {
@@ -73,5 +73,77 @@ object QuestManager {
         }
     }
 
+    fun unlockQuest(player: Player, questId: String) {
+        val config = QuestConfigHolder.config ?: error("Trying to unlock quest $questId but QuestConfig is not initialized")
+        if (questId !in config.visitQuests.keys) {
+            error("Trying to unlock quest $questId but it does not exist in the QuestConfig")
+        }
+        val questData = getQuestData(player)
+        if (questId in questData.activeQuests) {
+            error("Trying to unlock quest $questId but player already has it active")
+        }
+        if (questId in questData.completedQuests) {
+            error("Trying to unlock quest $questId but player has already completed it")
+        }
+        addQuest(player, questId)
+    }
 
+    fun getVisitQuestProgress(player: Player, questId: String): Pair<Int, Int> {
+        val config = QuestConfigHolder.config ?: error("Trying to get progress of quest $questId but QuestConfig is not initialized")
+        val visitQuest = config.visitQuests[questId] ?: error("Trying to get progress of quest $questId but it does not exist in the QuestConfig")
+        val questData = getQuestData(player)
+
+        val totalLocations = visitQuest.locations.size
+        if (totalLocations == 0) return 0 to 0
+
+        val visitedLocations = visitQuest.locations.count { locationData ->
+            locationData.name in questData.visitedLocations
+        }
+
+        return visitedLocations to totalLocations
+    }
+
+
+    fun isVisitQuestCompleted(questId: String, config: QuestConfig, questData: QuestData): Boolean {
+        val visitQuest = config.visitQuests[questId] ?: return false
+
+        return visitQuest.locations.all { locationData ->
+            locationData.name in questData.visitedLocations
+        }
+    }
+
+    fun isKillQuestCompleted(questId: String, config: QuestConfig, questData: QuestData): Boolean {
+        // Placeholder implementation
+        return false
+    }
+
+    fun isFetchQuestCompleted(questId: String, config: QuestConfig, questData: QuestData): Boolean {
+        // Placeholder implementation
+        return false
+    }
+
+    fun isQuestCompleted(player: Player, questId: String): Boolean {
+        val config = QuestConfigHolder.config ?: error("Trying to check completion of quest $questId but QuestConfig is not initialized")
+        val questData = getQuestData(player)
+        val activeQuests = questData.activeQuests
+        if (questId !in activeQuests) return false
+        return isVisitQuestCompleted(questId, config, questData) || isKillQuestCompleted(questId, config, questData) || isFetchQuestCompleted(questId, config, questData)
+    }
+
+
+    fun checkAndCompleteQuest(player: Player, questId: String) {
+        if (isQuestCompleted(player, questId)) {
+            completeQuest(player, questId)
+        }
+    }
+
+    fun playerHasUnlockedQuest(player: Player, questId: String): Boolean {
+        val questData = getQuestData(player)
+        return questId in questData.activeQuests
+    }
+
+    fun playerHasCompletedQuest(player: Player, questId: String): Boolean {
+        val questData = getQuestData(player)
+        return questId in questData.completedQuests
+    }
 }
