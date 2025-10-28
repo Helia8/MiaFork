@@ -35,6 +35,7 @@ class ShopKeepingFeature : FeatureWithContext<ShopKeepingFeature.Context>(::Cont
     override fun FeatureDSL.enable() = gearyPaper.run {
         println("Enabling Shopkeeping Feature")
         plugin.listeners(ShopKeepingListener())
+        println("dialogconfig keys are ${context.dialogsConfig.configs.keys}")
         val manager = NpcManager(context.npcconfig, getWorld("world")!!, context.dialogsConfig)
         manager.initNpc()
         plugin.listeners(manager)

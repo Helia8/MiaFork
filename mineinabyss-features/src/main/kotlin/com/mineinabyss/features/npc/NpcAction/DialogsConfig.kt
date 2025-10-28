@@ -20,7 +20,7 @@ import org.aselstudios.luxdialoguesapi.LuxDialoguesAPI
 import org.bukkit.entity.Player
 
 @Serializable
-@SerialName("custom_action")
+@SerialName("mineinabyss:custom_action")
 class CustomAction : Action {
     override fun ActionGroupContext.execute() {
         entity?.get<Player>()?.sendMessage("Custom action executed!")
@@ -29,7 +29,7 @@ class CustomAction : Action {
 
 // TODO: pass ticket id in the action serializer so we can tie unlocks to actions in config and avoid dealing with npc holding ticket id and such
 @Serializable
-@SerialName("unlock_gondola_action")
+@SerialName("mineinabyss:unlock_gondola_action")
 class gondolaUnlockerInteractionAction : Action {
     override fun ActionGroupContext.execute() {
         val player = entity?.get<Player>() ?: return
@@ -38,23 +38,23 @@ class gondolaUnlockerInteractionAction : Action {
     }
 }
 @Serializable
-@SerialName("unlock_quest_action")
+@SerialName("mineinabyss:unlock_quest_action")
 class unlockQuestAction(val questId: String) : Action {
     override fun ActionGroupContext.execute() {
         val player = entity?.get<Player>() ?: return
         val npc = environment["npc"] as? Npc ?: return
-        npc.questUnlockInteraction(player)
+        npc.questUnlockInteraction(player, questId)
     }
 }
 
 
 @Serializable
-@SerialName("complete_quest_action")
+@SerialName("mineinabyss:complete_quest_action")
 class completeQuestAction(val questId: String) : Action {
     override fun ActionGroupContext.execute() {
         val player = entity?.get<Player>() ?: return
         val npc = environment["npc"] as? Npc ?: return
-        npc.questCompleteInteraction(player)
+        npc.questCompleteInteraction(player, questId)
     }
 }
 
@@ -86,7 +86,7 @@ class AnswerData(
     @EncodeDefault(Mode.NEVER)
     val replyMessage: String? = null,
     @EncodeDefault(Mode.NEVER)
-    val action: Tasks? = null // a task could be CustomAction, UnlockQuestAction, CompleteQuestAction, etc @serialname = "custom_action"
+    val action: Tasks? = null   // a task could be CustomAction, UnlockQuestAction, CompleteQuestAction, etc @serialname = "custom_action"
 ) {
     val npc = null
     fun build(npc: Npc): Answer? {

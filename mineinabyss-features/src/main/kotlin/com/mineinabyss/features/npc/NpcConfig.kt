@@ -36,7 +36,7 @@ data class Npc(
     val dialogId: String? = null,
     val ticketId: String? = null,
     val questId : String? = null,
-    val questEndId: String? = null, // basically the dialog of id to use when talking to the npc after unlocking the quest
+    val questEndId: String? = null, // basically the dialog of id to use when talking to the npc after unlocking the quest; idk what i was cooking but this aint it
 ) {
 
 
@@ -119,19 +119,19 @@ data class Npc(
         }
     }
 
-    fun questCompleteInteraction(player: Player) {
+    fun questCompleteInteraction(player: Player, qid: String) {
         if (questId == null) {
             player.error("Missing questId")
             return
         }
-        completeQuest(player, questId)
+        completeQuest(player, qid)
     }
-    fun questUnlockInteraction(player: Player) {
+    fun questUnlockInteraction(player: Player, qid: String) {
         if (questId == null) {
             player.error("Missing questId")
             return
         }
-        unlockQuest(player, questId)
+        unlockQuest(player, qid)
         // this one is a bit more finicky, tho I think i'll do something like:
         // give the player a "objective" component, which would be something like:
         // (quest_id | progress | max_progress | completion_action)

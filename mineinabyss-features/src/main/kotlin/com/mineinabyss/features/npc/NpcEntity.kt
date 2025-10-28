@@ -25,7 +25,7 @@ import org.bukkit.inventory.MerchantRecipe
 class NpcEntity(
     val config: Npc,
     val mainWorld: World,
-    dialogsConfig: DialogsConfig,
+    val dialogsConfig: DialogsConfig,
     val dialogData: DialogData? = dialogsConfig.configs[config.dialogId],
     val questDialog: DialogData? = dialogsConfig.configs[config.questEndId]
 ) {
@@ -40,6 +40,7 @@ class NpcEntity(
                 println("removed old npc entity with id ${config.id}")
                 it.remove()
             } else {
+                println("dialog config is ${dialogsConfig.configs.keys}")
                 println("no old npc entity with id ${config.id} found")
             }
         }
