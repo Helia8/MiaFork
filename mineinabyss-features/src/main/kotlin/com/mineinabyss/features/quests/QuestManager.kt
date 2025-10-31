@@ -1,5 +1,6 @@
 package com.mineinabyss.features.quests
 
+import com.mineinabyss.features.helpers.luckPerms
 import com.mineinabyss.geary.papermc.toGeary
 import com.mineinabyss.geary.papermc.tracking.entities.toGeary
 import com.mineinabyss.geary.papermc.tracking.items.ItemTracking
@@ -7,6 +8,7 @@ import com.mineinabyss.geary.serialization.getOrSetPersisting
 import com.mineinabyss.geary.serialization.setPersisting
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.luckperms.api.node.Node
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -88,6 +90,9 @@ object QuestManager {
             val itemStack = ItemStack(material)
             itemStack.amount = amount.coerceIn(1, itemStack.maxStackSize)
             player.inventory.addItem(itemStack)
+        }
+        for (permName in config.visitQuests[questId]?.perms ?: return) {
+            luckPerms.userManager.getUser(player.uniqueId)?.data()?.add(Node.builder(permName).value(true).build())
         }
     }
 

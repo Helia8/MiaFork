@@ -12,6 +12,7 @@ data class VisitQuest(
     val locations: List<LocationData>,
     val gearyRewards: Map<PrefabKey, Int>? = null,
     val vanillaRewards: Map<String, Int>? = null,
+    val perms: List<String>? = null,
 ) {
 
 }
