@@ -55,6 +55,7 @@ class NpcEntity(
         entity.isCustomNameVisible = true
         entity.isPersistent = false
         entity.isResponsive = true
+        entity.teleport(location)
         val gearyEntity = entity.toGearyOrNull()?: return
         gearyEntity.set<Npc>(this@NpcEntity.config)
         if (dialogData != null) {
