@@ -10,8 +10,8 @@ import org.bukkit.Location
 data class VisitQuest(
     val questId: String,
     val locations: List<LocationData>,
-    val gearyRewards: Map<PrefabKey, Int>,
-    val vanillaRewards: Map<String, Int>,
+    val gearyRewards: Map<PrefabKey, Int>? = null,
+    val vanillaRewards: Map<String, Int>? = null,
 ) {
 
 }

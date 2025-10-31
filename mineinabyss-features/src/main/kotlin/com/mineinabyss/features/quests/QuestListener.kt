@@ -1,5 +1,6 @@
 package com.mineinabyss.features.quests
 
+import com.mineinabyss.features.quests.QuestManager.getVisitQuestProgress
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -34,6 +35,8 @@ class QuestListener(
             quest.value.locations.forEach { location ->
                 if (location.name !in playerVisitedLocations && location.isInside(to)) {
                     QuestManager.addVisitedLocation(player, location.name)
+                    val progress = getVisitQuestProgress(player, quest.key)
+                    player.sendActionBar("${progress.first}/${progress.second} locations visited for current quest!")
                 }
             }
         }

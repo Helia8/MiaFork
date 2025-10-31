@@ -3,6 +3,7 @@ package com.mineinabyss.features.npc
 import com.mineinabyss.features.npc.NpcAction.DialogData
 import com.mineinabyss.features.npc.NpcAction.DialogsConfig
 import com.mineinabyss.features.npc.NpcAction.QuestDialogData
+import com.mineinabyss.features.npc.shopkeeping.listenerSingleton
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import org.bukkit.World
 import org.bukkit.event.EventHandler
@@ -41,12 +42,13 @@ class NpcManager(
         }
     println("NPC Manager initialized with ${npcEntities.size} NPCs.")
     println("npc values are ${npcsConfig.npcs.values}")
+    listenerSingleton.bstgth = npcMap
     }
 
     @EventHandler
     fun ChunkLoadEvent.handleNpcSpawn() {
         //spawn npc
-        npcMap[chunk.chunkKey]?.forEach(NpcEntity::createBaseNpc)
+        listenerSingleton.bstgth!![chunk.chunkKey]?.forEach(NpcEntity::createBaseNpc)
     }
 
 
