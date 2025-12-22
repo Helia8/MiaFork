@@ -77,14 +77,16 @@ class NpcManager(
         if (dialogData == null) {
             player.sendMessage("dialog data missing for npc ${NpcData.id}")
         }
-        if (dialogId != null && dialogData != null && questDialogData != null) {
-            NpcData.defaultInteraction(player, dialogId, dialogData, questDialogData)
+        if (dialogId != null && dialogData != null) {
+            NpcData.defaultInteraction(player, dialogId, dialogData, null)
         } else {
             if (dialogId != null) {
                 player.sendMessage("This NPC is missing dialog data for ID: $dialogId")
                 NpcData.fallbackInteraction(player)
             }
         }
+        player.sendMessage("fallback")
+        NpcData.fallbackInteraction(player)
     }
 }
 

@@ -42,7 +42,7 @@ data class Npc(
 ) {
 
 
-    fun defaultInteraction(player: Player, dialogId: String, dialogData: DialogData, questDialogData: QuestDialogData) {
+    fun defaultInteraction(player: Player, dialogId: String, dialogData: DialogData, questDialogData: QuestDialogData?) {
         when (type) {
             "trader" -> traderInteraction(player)
             "gondola_unlocker" -> dialogInteraction(player, dialogId, dialogData)
@@ -53,6 +53,7 @@ data class Npc(
     }
 
     fun fallbackInteraction(player: Player) {
+        player.sendMessage("type is $type")
         when (type) {
             "trader" -> traderInteraction(player)
             "gondola_unlocker" -> gondolaUnlockerInteraction(player)
@@ -102,6 +103,7 @@ data class Npc(
 
 
     fun traderInteraction(player: Player) {
+        player.sendMessage("trades are ${tradeTable.trades}")
         if (tradeTable.trades.isEmpty()) return
         val recipes = tradeTable.createMerchantRecipes() ?: return
         val merchant = Bukkit.createMerchant()

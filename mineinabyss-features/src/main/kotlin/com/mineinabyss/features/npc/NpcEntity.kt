@@ -15,6 +15,7 @@ import com.mineinabyss.idofront.spawning.spawn
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.ticxo.modelengine.api.ModelEngineAPI
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.entity.Interaction
 import org.bukkit.entity.ItemDisplay
@@ -75,30 +76,33 @@ class NpcEntity(
 
     // everything else in this file is probably not gonna get used
     //-------------------------------------------
-    fun createTypedNpc() {
-        when (config.type) {
-            "trader" -> createTraderNpc()
-            "gondola_unlocker" -> createGondolaUnlockerNpc()
-            "quest_giver" -> createQuestGiverNpc()
-            "dialogue" -> createDialogueNpc()
-            else -> throw IllegalArgumentException("Unknown type ${config.type}")
-        }
-    }
-
-    fun createDialogueNpc() {
-
-    }
-
-    fun createQuestGiverNpc() {
-
-    }
-
-    fun createGondolaUnlockerNpc() {
-
-    }
+//    fun createTypedNpc() {
+//        when (config.type) {
+//            "trader" -> createTraderNpc()
+//            "gondola_unlocker" -> createGondolaUnlockerNpc()
+//            "quest_giver" -> createQuestGiverNpc()
+//            "dialogue" -> createDialogueNpc()
+//            else -> throw IllegalArgumentException("Unknown type ${config.type}")
+//        }
+//    }
+//
+//    fun createDialogueNpc() {
+//
+//    }
+//
+//    fun createQuestGiverNpc() {
+//
+//    }
+//
+//    fun createGondolaUnlockerNpc() {
+//
+//    }
 
     fun createTraderNpc() {
-        if (config.tradeTable.trades.isNotEmpty()) {
+        if (!config.tradeTable.trades.isNotEmpty()) {
+            return
+        }
+
 
             val location = config.location
             val chunk = location.chunk
@@ -136,7 +140,7 @@ class NpcEntity(
                     }
                 }
             }, abyss.plugin)
-        }
+
 
         return
     }
@@ -144,10 +148,28 @@ class NpcEntity(
     fun createMerchantRecipes(trades: List<Trade>): List<MerchantRecipe> {
         val gearyItems = mainWorld.toGeary().getAddon(ItemTracking)
         val recipes = mutableListOf<MerchantRecipe>()
+        lateinit var inputItem: ItemStack
+        lateinit var outputItem: ItemStack
         for (trade in trades) {
-            val inputItem: ItemStack = gearyItems.createItem(PrefabKey.Companion.of(trade.input.prefab)) ?: error("Incorrect prefab key: ${trade.input.prefab}")
+            var namespace = PrefabKey.Companion.of(trade.input.prefab).namespace
+            if (namespace == "minecraft") {
+                inputItem = ItemStack(Material.matchMaterial(trade.input.prefab)?: error("Incorrect prefab key: ${trade.input.prefab}"))
+            }
+             else if (namespace == "mineinabyss") {
+                inputItem = gearyItems.createItem(PrefabKey.Companion.of(trade.input.prefab)) ?: error("Incorrect prefab key: ${trade.input.prefab}")
+            } else {
+                error("Incorrect prefab key: ${trade.input.prefab}")
+            }
             inputItem.amount = trade.input.amount
-            val outputItem = gearyItems.createItem(PrefabKey.Companion.of(trade.output.prefab)) ?: error("Incorrect prefab key: ${trade.output.prefab}")
+            namespace =  PrefabKey.Companion.of(trade.output.prefab).namespace
+            if (namespace == "minecraft") {
+                outputItem = ItemStack(Material.matchMaterial(trade.output.prefab)?: error("Incorrect prefab key: ${trade.output.prefab}"))
+            }
+             else if (namespace == "mineinabyss") {
+                outputItem = gearyItems.createItem(PrefabKey.Companion.of(trade.output.prefab)) ?: error("Incorrect prefab key: ${trade.output.prefab}")
+            } else {
+                error("Incorrect prefab key: ${trade.output.prefab}")
+            }
             outputItem.amount = trade.output.amount
 
             val recipe = MerchantRecipe(outputItem, 99999)
