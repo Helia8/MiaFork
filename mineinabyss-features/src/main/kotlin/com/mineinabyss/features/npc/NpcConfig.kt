@@ -32,7 +32,7 @@ data class Npc(
     val location: @Serializable(LocationSerializer::class) Location,
     val scale: List<Double>, // ??
     val bbModel: String, // unsure, actually I guess it would be serializable
-    val tradeTable: TradeTable, // todo: remove
+    var tradeTable: TradeTable, // todo: remove
     val tradeTableId: String, // use id pulled from config instead to be more modular
     val type: String, // "trader", "gondola_unlocker", "quest_giver", "dialogue"
     val dialogId: String? = null,

@@ -3,6 +3,7 @@ package com.mineinabyss.features.npc
 import com.mineinabyss.features.npc.NpcAction.DialogData
 import com.mineinabyss.features.npc.NpcAction.DialogsConfig
 import com.mineinabyss.features.npc.NpcAction.QuestDialogData
+import com.mineinabyss.features.npc.shopkeeping.TradeTable
 import com.mineinabyss.features.npc.shopkeeping.listenerSingleton
 import com.mineinabyss.geary.papermc.tracking.entities.toGearyOrNull
 import org.bukkit.World
@@ -30,10 +31,11 @@ class NpcManager(
     var npcEntities: List<NpcEntity> = emptyList()
     val npcMap: MutableMap<Long, List<NpcEntity>> = mutableMapOf()
 
-    fun initNpc() {
+    fun initNpc(trades: List<TradeTable>) {
         // load npc config
         for (npc in npcsConfig.npcs.values) {
             val npcEntity = NpcEntity(npc, world, dialogsConfig)
+            npcEntity.config.tradeTable = trades.find { it.id == npc.tradeTableId } ?: TradeTable("empty", emptyList())
             npcEntities = npcEntities + npcEntity
 
             val chunkKey = npc.location.chunk.chunkKey

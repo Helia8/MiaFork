@@ -27,7 +27,7 @@ import org.bukkit.inventory.MenuType
 import org.bukkit.inventory.MerchantRecipe
 
 class NpcEntity(
-    val config: Npc,
+    var config: Npc,
     val mainWorld: World,
     val dialogsConfig: DialogsConfig,
     val dialogData: DialogData? = dialogsConfig.configs[config.dialogId],

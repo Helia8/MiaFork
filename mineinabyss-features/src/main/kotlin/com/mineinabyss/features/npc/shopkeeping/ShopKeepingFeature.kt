@@ -1,5 +1,7 @@
 package com.mineinabyss.features.npc.shopkeeping
 
+import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.decodeFromStream
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.components.npc.shopkeeping.ShopKeeper
 import com.mineinabyss.features.abyss
@@ -43,6 +45,14 @@ class ShopKeepingFeature : FeatureWithContext<ShopKeepingFeature.Context>(::Cont
         override val configManager: IdofrontConfig<NpcsConfig> = config("npc", abyss.dataPath, NpcsConfig())
         val npcconfig by  config("npc", abyss.dataPath, NpcsConfig())
         val dialogsConfig by config("dialogs", abyss.dataPath, DialogsConfig())
+
+        val trades: List<TradeTable> = abyss.dataPath.resolve("trades").toFile().walk().filter {
+            it.isFile()
+        }.map {
+            Yaml.default.decodeFromStream<TradeTable>(it.inputStream())
+        }.toList()
+
+
         val manager = NpcManager(npcconfig, getWorld("world")!!, dialogsConfig)
     }
     override fun FeatureDSL.enable() = gearyPaper.run {
@@ -50,9 +60,11 @@ class ShopKeepingFeature : FeatureWithContext<ShopKeepingFeature.Context>(::Cont
         plugin.listeners(ShopKeepingListener())
         plugin.launch {
             delay(10.seconds)
-            runCatching { context.manager.initNpc() }.onFailure { it.printStackTrace() }
+            runCatching { context.manager.initNpc(context.trades) }.onFailure { it.printStackTrace() }
         }
         plugin.listeners(context.manager)
+        println("Loaded ${context.trades.size} trade tables.")
+        println("content of trdes are ${context.trades}")
 //        println("dialogconfig keys are ${context.dialogsConfig.configs.keys}")
 //        val manager = NpcManager(context.npcconfig, getWorld("world")!!, context.dialogsConfig)
 //        manager.initNpc()
@@ -80,7 +92,7 @@ class ShopKeepingFeature : FeatureWithContext<ShopKeepingFeature.Context>(::Cont
             "npcs" {
                 "reload" {
                     action {
-                        context.manager.initNpc()
+                        context.manager.initNpc(context.trades)
                     }
                 }
             }
