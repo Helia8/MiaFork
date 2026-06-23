@@ -27,7 +27,6 @@ import com.mineinabyss.features.keepinventory.KeepInvFeature
 import com.mineinabyss.features.layers.LayersContext
 import com.mineinabyss.features.layers.LayersFeature
 import com.mineinabyss.features.lootcrates.LootCratesFeature
-import com.mineinabyss.features.lootcrates.database.LootedChests
 import com.mineinabyss.features.misc.MiscFeature
 import com.mineinabyss.features.music.MusicFeature
 import com.mineinabyss.features.npc.shopkeeping.ShopKeepingFeature
@@ -105,7 +104,7 @@ class MineInAbyssPlugin : JavaPlugin(), AbyssContext {
         PrefabNamespaceMigrations.migrations += listOf("looty" to "mineinabyss", "mobzy" to "mineinabyss")
         transaction(db) {
             //addLogger(StdOutSqlLogger)
-            SchemaUtils.createMissingTablesAndColumns(Guilds, Players, GuildJoinQueue, GuildMessageQueue, LootedChests)
+            SchemaUtils.createMissingTablesAndColumns(Guilds, Players, GuildJoinQueue, GuildMessageQueue)
         }
 
         if (isPlaceholderApiLoaded) Placeholders().register()

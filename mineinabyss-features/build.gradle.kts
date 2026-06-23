@@ -36,6 +36,7 @@ dependencies {
     compileOnly(miaLibs.reflections)
     compileOnly(miaLibs.sqlite.jdbc)
     compileOnly(miaLibs.sqlite.kt)
+    compileOnly("com.mineinabyss:idofront-datastore")
 
     // Plugin libs
     compileOnly(libs.deeperworld)
@@ -66,13 +67,13 @@ kotlin {
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             "-opt-in=kotlin.uuid.ExperimentalUuidApi",
             "-opt-in=kotlin.ExperimentalUnsignedTypes",
-            "-Xcontext-parameters",
         )
     }
 }
 val compileKotlin: KotlinCompile by tasks
-
-
+copyJar {
+    jarName = "mineinabyss-${version}.jar"
+}
 paper {
     name = "MineInAbyss"
     main = "com.mineinabyss.features.MineInAbyssPlugin"
@@ -180,11 +181,6 @@ paper {
             joinClasspath = true
         }
         register("Packy") {
-            required = false
-            load = BEFORE
-            joinClasspath = true
-        }
-        register("Blocky") {
             required = false
             load = BEFORE
             joinClasspath = true

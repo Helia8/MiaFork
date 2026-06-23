@@ -11,6 +11,10 @@ pluginManagement {
     }
 }
 
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 dependencyResolutionManagement {
     val miaLibs: String by settings
 
@@ -33,3 +37,4 @@ include(
 )
 
 includeBuild("../Idofront")
+includeBuild("../sqlite-kt")
