@@ -56,7 +56,7 @@ class NpcEntity(
             val nametag = location.world.spawn(location, TextDisplay::class.java) { tag ->
                 tag.addScoreboardTag(config.id)
                 tag.text(config.customName.miniMsg())
-                tag.billboard = Display.Billboard.HORIZONTAL
+                tag.billboard = Display.Billboard.VERTICAL
                 tag.setTransformationMatrix(Matrix4f().translate(0f, config.nametagHeight.toFloat(), 0f))
             }
             entity.addPassenger(nametag)
