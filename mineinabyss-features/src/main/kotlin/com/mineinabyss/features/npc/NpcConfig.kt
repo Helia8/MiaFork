@@ -39,6 +39,8 @@ data class Npc(
     val location: @Serializable(LocationAltSerializer::class) Location,
     val scale: @Serializable(VectorAltSerializer::class) Vector,
     val bbModel: String,
+    @EncodeDefault(NEVER) val shouldDisplayName: Boolean = false,
+    @EncodeDefault(NEVER) val nametagHeight: Double = 2.5,
     @EncodeDefault(NEVER) val tradeTableId: String = "",
     @EncodeDefault(NEVER) val dialogId: String? = null,
     @EncodeDefault(NEVER) val ticketId: String? = null,

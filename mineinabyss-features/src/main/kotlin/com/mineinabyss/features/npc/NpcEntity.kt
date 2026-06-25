@@ -16,14 +16,17 @@ import com.mineinabyss.idofront.textcomponents.miniMsg
 import com.ticxo.modelengine.api.ModelEngineAPI
 import org.bukkit.Bukkit
 import org.bukkit.World
+import org.bukkit.entity.Display
 import org.bukkit.entity.Interaction
 import org.bukkit.entity.ItemDisplay
+import org.bukkit.entity.TextDisplay
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.inventory.MenuType
 import org.bukkit.inventory.MerchantRecipe
-
+import org.joml.Matrix4f
+import kotlin.jvm.java
 class NpcEntity(
     val config: Npc,
     val mainWorld: World,
@@ -43,10 +46,23 @@ class NpcEntity(
 
         entity.addScoreboardTag(config.id)
         entity.customName(config.customName.miniMsg())
-        entity.isCustomNameVisible = true
+        entity.isCustomNameVisible = false
         entity.isPersistent = false
 //        entity.isResponsive = true
         entity.teleport(location)
+
+
+        if (config.shouldDisplayName) {
+            val nametag = location.world.spawn(location, TextDisplay::class.java) { tag ->
+                tag.addScoreboardTag(config.id)
+                tag.text(config.customName.miniMsg())
+                tag.billboard = Display.Billboard.HORIZONTAL
+                tag.setTransformationMatrix(Matrix4f().translate(0f, config.nametagHeight.toFloat(), 0f))
+            }
+            entity.addPassenger(nametag)
+        }
+
+
 
         val gearyEntity = entity.toGearyOrNull()?: return
         gearyEntity.set<Npc>(this@NpcEntity.config)
@@ -56,6 +72,7 @@ class NpcEntity(
             val activeModel = ModelEngineAPI.createActiveModel(config.bbModel)
             modeledEntity.addModel(activeModel, true)
         }
+
 
         if (dialogData != null) gearyEntity.set<DialogData>(this@NpcEntity.dialogData)
         else abyss.logger.w("Could not set dialog data for npc ${config.id}")
