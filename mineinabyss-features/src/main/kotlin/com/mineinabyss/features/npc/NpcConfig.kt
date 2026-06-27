@@ -2,23 +2,18 @@ package com.mineinabyss.features.npc
 
 import com.mineinabyss.components.editPlayerData
 import com.mineinabyss.components.gondolas.Ticket
+import com.mineinabyss.dependencies.get
+import com.mineinabyss.dependencies.scope
+import com.mineinabyss.features.abyss
 import com.mineinabyss.features.gondolas.pass.TicketConfigHolder
 import com.mineinabyss.features.gondolas.pass.isRouteUnlocked
 import com.mineinabyss.features.gondolas.pass.unlockRoute
 import com.mineinabyss.features.npc.action.DialogData
 import com.mineinabyss.features.npc.action.QuestDialogData
-import com.mineinabyss.features.npc.shopkeeping.TradeTable
+import com.mineinabyss.features.npc.shopkeeping.TradeConfigHolder
+import com.mineinabyss.features.quests.QuestFeature
 import com.mineinabyss.features.quests.QuestManager
-import com.mineinabyss.features.quests.QuestManager.checkAndCompleteQuest
-import com.mineinabyss.features.quests.QuestManager.isQuestCompleted
-import com.mineinabyss.features.quests.QuestManager.playerHasCompletedQuest
-import com.mineinabyss.features.quests.QuestManager.playerHasUnlockedQuest
-import com.mineinabyss.features.quests.QuestManager.unlockQuest
-import com.mineinabyss.idofront.messaging.error
-import com.mineinabyss.idofront.messaging.idofrontLogger
-import com.mineinabyss.idofront.messaging.info
-import com.mineinabyss.idofront.messaging.success
-import com.mineinabyss.idofront.messaging.warn
+import com.mineinabyss.idofront.messaging.*
 import com.mineinabyss.idofront.serialization.LocationAltSerializer
 import com.mineinabyss.idofront.serialization.VectorAltSerializer
 import kotlinx.serialization.EncodeDefault
@@ -44,8 +39,7 @@ data class Npc(
     val location: @Serializable(LocationAltSerializer::class) Location,
     val scale: @Serializable(VectorAltSerializer::class) Vector,
     val bbModel: String,
-    val tradeTable: TradeTable, // todo: remove
-    val tradeTableId: String, // use id pulled from config instead to be more modular
+    @EncodeDefault(NEVER) val tradeTableId: String = "",
     @EncodeDefault(NEVER) val dialogId: String? = null,
     @EncodeDefault(NEVER) val ticketId: String? = null,
     @EncodeDefault(NEVER) val questId: String? = null,
@@ -86,33 +80,33 @@ data class Npc(
     fun questGiverInteraction(player: Player, questDialogData: QuestDialogData? = null, dialogData: DialogData? = null) {
         if (questDialogData == null) return
         if (questId == null) return
+        val manager = abyss.scope[QuestFeature]?.get<QuestManager>() ?: error("Quests feature not enabled")
         when {
             // Quest is done, reward is claimed
-            playerHasCompletedQuest(player, questId) -> {
+            manager.playerHasCompletedQuest(player, questId) -> {
                 player.info("You have already completed this quest.")
             }
 
             // Quest is done but reward not claimed yet
-            isQuestCompleted(player, questId) -> {
+            manager.isQuestCompleted(player, questId) -> {
                 if (questEndId != null) {
                     questDialogData.dialogData.startDialogue(player, questEndId, this)
-                }
-                else {
+                } else {
                     player.warn("No end dialog set for questId '$questId', you should probably report this")
                 }
             }
 
             // Quest is started but not completed
-            playerHasUnlockedQuest(player, questId) -> {
+            manager.playerHasUnlockedQuest(player, questId) -> {
                 player.error(
                     "Come back when you've completed this quest: " +
                             PlainTextComponentSerializer.plainText()
-                                .serialize(QuestManager.questInformation(player, questId))
+                                .serialize(manager.questInformation(player, questId))
                 )
             }
 
             // Quest is not started
-            dialogData != null && !playerHasUnlockedQuest(player, questId) -> {
+            dialogData != null && !manager.playerHasUnlockedQuest(player, questId) -> {
                 dialogData.startDialogue(player, dialogId ?: return, this)
             }
         }
@@ -120,7 +114,26 @@ data class Npc(
 
 
     fun traderInteraction(player: Player) {
-        if (tradeTable.trades.isEmpty()) return
+        val npcPlainName = PlainTextComponentSerializer.plainText()
+            .serialize(MiniMessage.miniMessage().deserialize(customName))
+
+        val tableId = tradeTableId.trim()
+        if (tableId.isEmpty()) {
+            player.error("Missing trade table for $npcPlainName, report this")
+            return
+        }
+
+        val tradeTable = TradeConfigHolder.config?.tradeTables?.get(tableId)
+        if (tradeTable == null) {
+            player.error("Invalid trade table for $npcPlainName, report this")
+            return
+        }
+
+        if (tradeTable.trades.isEmpty()) {
+            player.error("No trades configured for $npcPlainName, report this")
+            return
+        }
+
         val recipes = tradeTable.createMerchantRecipes() ?: return
         val merchant = Bukkit.createMerchant().apply { this.recipes = recipes }
         MenuType.MERCHANT.builder().merchant(merchant).build(player).open()
@@ -152,12 +165,14 @@ data class Npc(
 
     fun questCompleteInteraction(player: Player) {
         if (questId == null) return player.error("Missing questId")
-        checkAndCompleteQuest(player, questId)
+        val manager = abyss.scope[QuestFeature]?.get<QuestManager>() ?: error("Quests feature not enabled")
+        manager.checkAndCompleteQuest(player, questId)
     }
 
     fun questUnlockInteraction(player: Player) {
         if (questId == null) return player.error("Missing questId")
-        unlockQuest(player, questId)
+        val manager = abyss.scope[QuestFeature]?.get<QuestManager>() ?: error("Quests feature not enabled")
+        manager.unlockQuest(player, questId)
         // this one is a bit more finicky, tho I think i'll do something like:
         // give the player a "objective" component, which would be something like:
         // (quest_id | progress | max_progress | completion_action)

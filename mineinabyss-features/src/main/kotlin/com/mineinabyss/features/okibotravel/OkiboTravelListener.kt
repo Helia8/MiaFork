@@ -5,7 +5,6 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.components.editPlayerData
 import com.mineinabyss.components.okibotravel.OkiboTraveler
 import com.mineinabyss.features.abyss
-import com.mineinabyss.features.helpers.di.Features.okiboLine
 import com.mineinabyss.geary.actions.ActionGroupContext
 import com.mineinabyss.geary.actions.execute
 import com.mineinabyss.geary.helpers.with
@@ -24,31 +23,31 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.EquipmentSlot
 import kotlin.time.Duration.Companion.seconds
 
-class OkiboTravelListener : Listener {
-
+class OkiboTravelListener(
+    val config: OkiboTravelConfig,
+    val okibo: OkiboRepository,
+) : Listener {
     private val okiboMapCooldown = Cooldown(1.seconds, null, "mineinabyss:okibomap")
 
     @EventHandler
-    fun PlayerChunkLoadEvent.onLoad() {
-        abyss.plugin.launch {
-            delay(2.ticks)
-            val chunkKey = chunk.chunkKey
-            val okiboMap = okiboLine.config.okiboMaps.firstOrNull {
-                if (!it.location.isWorldLoaded || !it.location.isChunkLoaded) return@firstOrNull false
-                it.location.chunk.chunkKey == chunkKey
-            } ?: return@launch
-            player.sendOkiboMap(okiboMap)
-        }
+    suspend fun PlayerChunkLoadEvent.onLoad() {
+        delay(2.ticks)
+        val chunkKey = chunk.chunkKey
+        val okiboMap = config.okiboMaps.firstOrNull {
+            if (!it.location.isWorldLoaded || !it.location.isChunkLoaded) return@firstOrNull false
+            it.location.chunk.chunkKey == chunkKey
+        } ?: return
+        okibo.sendMap(player, okiboMap)
     }
 
     @EventHandler
     fun PlayerChunkUnloadEvent.onUntrack() {
         val chunkKey = chunk.chunkKey
-        val okiboMap = okiboLine.config.okiboMaps.firstOrNull {
+        val okiboMap = config.okiboMaps.firstOrNull {
             if (!it.location.isWorldLoaded || !it.location.isChunkLoaded) return@firstOrNull false
             it.location.chunk.chunkKey == chunkKey
         } ?: return
-        player.removeOkiboMap(okiboMap)
+        okibo.removeMap(player, okiboMap)
     }
 
     @EventHandler
@@ -56,11 +55,10 @@ class OkiboTravelListener : Listener {
         val gearyPlayer = player.toGeary().takeIf { hand == EquipmentSlot.HAND } ?: return
         if (!Cooldowns.isComplete(gearyPlayer, okiboMapCooldown.id)) return
         okiboMapCooldown.execute(ActionGroupContext(gearyPlayer))
-        val destination = getHitboxStation(entityId)?.getStation ?: return
-        val playerStation = okiboLine.config.allStations.filter { it != destination }.minByOrNull { it.location.distanceSquared(player.location) } ?: return player.error("You are not near a station!")
-        val cost = playerStation.costTo(destination) ?: return player.error("You cannot travel to that station!")
-
-        abyss.plugin.launch {
+        val destination = okibo.getHitboxStation(entityId)?.let { okibo.stationFor(it) } ?: return
+        val playerStation = config.allStations.filter { it != destination }.minByOrNull { it.location.distanceSquared(player.location) } ?: return player.error("You are not near a station!")
+        val cost = okibo.cost(playerStation, destination) ?: return player.error("You cannot travel to that station!")
+        abyss.launch {
             delay(5.seconds)
             if (player.isOnline) gearyPlayer.remove<OkiboTraveler>()
         }
@@ -74,12 +72,13 @@ class OkiboTravelListener : Listener {
                             playerStation == destination -> player.error("You are already at that station!")
                             else -> {
                                 if (cost > 0) orthCoinsHeld -= cost
-                                spawnOkiboCart(player, playerStation, destination)
+                                okibo.spawnCart(player, playerStation, destination)
                             }
                         }
                     }
                     return
                 }
+
                 else -> player.toGeary().remove<OkiboTraveler>()
             }
         }

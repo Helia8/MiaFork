@@ -1,12 +1,8 @@
 package com.mineinabyss.features.npc.shopkeeping
 
 import androidx.compose.runtime.Composable
-import com.mineinabyss.components.npc.shopkeeping.ShopCurrency
-import com.mineinabyss.components.npc.shopkeeping.ShopKeeper
-import com.mineinabyss.components.npc.shopkeeping.ShopTrade
-import com.mineinabyss.components.npc.shopkeeping.ShopTradeSerializer
-import com.mineinabyss.components.npc.shopkeeping.TradeAction
-import com.mineinabyss.components.playerData
+import androidx.compose.ui.unit.dp
+import com.mineinabyss.components.npc.shopkeeping.*
 import com.mineinabyss.components.playerDataOrNull
 import com.mineinabyss.features.abyss
 import com.mineinabyss.features.helpers.CoinFactory
@@ -22,6 +18,8 @@ import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.Spacer
 import com.mineinabyss.idofront.messaging.error
 import kotlinx.serialization.Serializable
+import me.dvyy.compose.mini.layout.modifiers.width
+import me.dvyy.compose.mini.modifier.Modifier
 import net.luckperms.api.node.Node
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -121,8 +119,8 @@ fun List<@Serializable(with = ShopTradeSerializer::class) ShopTrade>.handleTrade
                         else player.error("Failed to execute command!")
                     }
 
-                    TradeAction.CONSOLE_COMMAND -> abyss.plugin.server.dispatchCommand(
-                        abyss.plugin.server.consoleSender,
+                    TradeAction.CONSOLE_COMMAND -> abyss.server.dispatchCommand(
+                        abyss.server.consoleSender,
                         tradeAction.getValue(player)
                     )
 
@@ -148,7 +146,7 @@ fun List<@Serializable(with = ShopTradeSerializer::class) ShopTrade>.handleTrade
         ) {
             //TODO Alter how disabled trades are displayed
             Item(coin)
-            Spacer(width = 1)
+            Spacer(Modifier.width(1.dp))
             Item(tradeItem)
         }
     }

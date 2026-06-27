@@ -1,7 +1,17 @@
 plugins {
-    alias(idofrontLibs.plugins.mia.kotlin.jvm)
-    alias(idofrontLibs.plugins.mia.papermc)
-    alias(idofrontLibs.plugins.mia.nms)
+    alias(miaLibs.plugins.kotlin.jvm)
+    alias(miaLibs.plugins.mia.papermc)
+    alias(miaLibs.plugins.mia.nms)
+    alias(miaLibs.plugins.mia.publication)
     kotlin("plugin.serialization")
-    alias(idofrontLibs.plugins.mia.publication)
+}
+
+
+dependencies {
+    compileOnly(libs.deeperworld)
+    compileOnly(miaLibs.geary.papermc)
+    compileOnly(miaLibs.bundles.idofront.core)
+    compileOnly(miaLibs.idofront.nms)
+    compileOnly(miaLibs.kotlinx.serialization.json)
+    compileOnly(miaLibs.kotlinx.serialization.kaml)
 }
