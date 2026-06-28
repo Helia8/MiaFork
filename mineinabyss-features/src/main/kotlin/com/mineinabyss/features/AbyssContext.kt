@@ -31,3 +31,4 @@ interface AbyssContext : Plugin, com.mineinabyss.dependencies.DI {
         var instance: AbyssContext? = null
     }
 }
+
