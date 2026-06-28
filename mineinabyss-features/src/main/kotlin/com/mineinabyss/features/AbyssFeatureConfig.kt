@@ -48,4 +48,5 @@ class AbyssFeatureConfig(
     val tools: Toggle = Toggle(),
     val tutorial: Toggle = Toggle(),
     val quests: Toggle = Toggle(),
+    val gorebag: Toggle = Toggle(),
 )
