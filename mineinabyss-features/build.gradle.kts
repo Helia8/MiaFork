@@ -36,7 +36,7 @@ dependencies {
     compileOnly(miaLibs.reflections)
     compileOnly(miaLibs.sqlite.jdbc)
     compileOnly(miaLibs.sqlite.kt)
-    compileOnly("com.mineinabyss:idofront-datastore")
+    compileOnly("com.mineinabyss:idofront-datastore:${miaLibs.versions.idofront.get()}")
 
     // Plugin libs
     compileOnly(libs.deeperworld)
