@@ -12,7 +12,7 @@ class AdvancementSyncListener : Listener {
     @EventHandler
     fun PlayerAdvancementDoneEvent.onAdvancementDone() {
         player.launchWrite {
-            AchievementStore[player, advancement.key.asString()] = AchievementProgress(completed = true)
+            AchievementStore[player, advancement.key.asString()] = GoalProgress(completed = true)
         }
     }
 }

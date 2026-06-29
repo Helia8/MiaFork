@@ -10,16 +10,18 @@ import kotlin.time.Clock
 import kotlin.time.Instant
 
 @Serializable
-data class AchievementProgress(
+data class GoalProgress(
     val completed: Boolean,
     val completionTime: @Serializable(with = InstantAsEpochSecondsSerializer::class) Instant = Clock.System.now(),
+    val visitedPlaces : List<String> = emptyList(),
     val extras: JsonObject = JsonObject(emptyMap()),
+
 )
 
-object AchievementStore : KeyedMinecraftDataStore<String, AchievementProgress>(
-    keyedJsonTable("achievements") {
+object AchievementStore : KeyedMinecraftDataStore<String, GoalProgress>(
+    keyedJsonTable("goals") {
         index("completionTime", "data ->> '$.completionTime'")
     },
     String.serializer(),
-    AchievementProgress.serializer()
+    GoalProgress.serializer()
 )
