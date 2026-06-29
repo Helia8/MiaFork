@@ -12,6 +12,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
+import org.bukkit.event.player.PlayerAttemptPickupItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -22,8 +23,8 @@ class GorebagListener(
 ): Listener {
     val uuid_to_item: HashMap<UUID, Gorebag> = hashMapOf()
     @EventHandler
-    fun EntityPickupItemEvent.onPickup() {
-        val player = entity
+    fun PlayerAttemptPickupItemEvent.onPickup() {
+
         if (player is Player && player.hasGorebag()) { // player has gorebag
             isCancelled = true
             // bundle store sound played at player
