@@ -1,56 +1,39 @@
 package com.mineinabyss.features.goals.dataStore
 
-import com.mineinabyss.features.goals.Goal
+import com.mineinabyss.features.goals.ConditionProgress
 import com.mineinabyss.idofront.datastore.KeyedMinecraftDataStore
 import com.mineinabyss.idofront.serialization.InstantAsEpochSecondsSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.json.JsonObject
 import me.dvyy.sqlite.Transaction
-import me.dvyy.sqlite.WriteTransaction
 import me.dvyy.sqlite.datastore.keyedJsonTable
-import org.bukkit.entity.Player
-import kotlin.time.Clock
+import org.bukkit.entity.Entity
 import kotlin.time.Instant
+import kotlin.uuid.toKotlinUuid
 
 @Serializable
 data class GoalProgress(
-    val completed: Boolean, // 'completed' can be used as is for goals that doesn't need state tracking. Their progress can be directly handled in the listener
-    val completionTime: @Serializable(with = InstantAsEpochSecondsSerializer::class) Instant = Clock.System.now(),
-    val visitedPlaces : List<String> = emptyList(),
-    val craftedItems: List<String> = emptyList(),
-    val mobsKilled: List<Map<String, Int>> = emptyList(),
-    val extras: JsonObject = JsonObject(emptyMap()),
+    val completed: Boolean = false,
+    val completionTime: @Serializable(with = InstantAsEpochSecondsSerializer::class) Instant? = null,
+    val conditions: Map<Int, ConditionProgress> = emptyMap(),
+)
 
-    )
-
-object GoalStore : KeyedMinecraftDataStore<String, GoalProgress>(
-    keyedJsonTable("goals") {
+open class GoalProgressStore(tableName: String) : KeyedMinecraftDataStore<String, GoalProgress>(
+    keyedJsonTable(tableName) {
         index("completionTime", "data ->> '$.completionTime'")
     },
     String.serializer(),
-    GoalProgress.serializer()
+    GoalProgress.serializer(),
 ) {
-    context(tx: WriteTransaction)
-     fun isCompleted(player: Player, goal: String): Boolean {
-        return false
-    }
-
-    context(tx: WriteTransaction)
-     fun setCompleted(player: Player, goal: String, completed: Boolean) {
-
-    }
-
-    context(tx: WriteTransaction)
-     fun getVisitedPlaces(player: Player): List<String> {
-        return emptyList()
-    }
-
     context(tx: Transaction)
-    fun getProgress(player: Player, goal: Goal): GoalProgress? {
-        val progress = this[player, goal.id]
-        return progress
+    fun getAll(entity: Entity): Map<String, GoalProgress> {
+        return tx.getList(
+            "SELECT json(key), json(data) FROM $tableName WHERE id = ? AND data IS NOT null",
+            entity.uniqueId.toKotlinUuid(),
+        ) {
+            json.decodeFromString(keySerializer, getText(0)) to json.decodeFromString(serializer, getText(1))
+        }.toMap()
     }
-
-    // goals operations would be added here
 }
+
+object GoalStore : GoalProgressStore("goals")

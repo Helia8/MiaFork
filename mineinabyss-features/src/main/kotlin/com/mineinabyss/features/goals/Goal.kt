@@ -1,43 +1,29 @@
 package com.mineinabyss.features.goals
 
 import com.mineinabyss.features.goals.dataStore.GoalProgress
-import com.mineinabyss.idofront.serialization.InstantAsEpochSecondsSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
-import kotlin.time.Clock
-import kotlin.time.Instant
 
+@Serializable
 data class Goal(
     // Goal info
     val id: String,
     val name: String,
-    val description: String,
+    val description: String = "",
 
     // Goal content
-    val toVisit : List<String> = emptyList(),
-    val toCraft: List<String> = emptyList(),
-    val toKill: List<Map<String, Int>> = emptyList(),
+    val conditions: List<GoalCondition> = emptyList(),
 ) {
 
-    fun validate(progress: GoalProgress): Boolean {
-
-        val places = progress.visitedPlaces.containsAll(toVisit)
-
-        val items = progress.craftedItems.containsAll(toCraft)
-
-        val mobs = toKill.all { required ->
-            progress.mobsKilled.any { actual ->
-                required.all { (key, count) ->
-                    (actual[key] ?: 0) >= count
-                }
-            }
-        }
-        // Hopefully kotlin is smart enough to not actually store those variables 🤞
-        return places && items && mobs
+    fun validate(progress: GoalProgress): Boolean = conditions.withIndex().all { (i, condition) ->
+        condition.isMet(progress.conditions[i] ?: ConditionProgress())
     }
 
+    fun tracksAny(kind: FactKind, value: String) = conditions.any { it.tracks(kind, value) }
+}
 
-    fun hasLocation() : Boolean {
-        return toVisit.isNotEmpty();
-    }
+@Serializable
+data class GoalsConfig(
+    val goals: List<Goal> = emptyList(),
+) {
+    fun byId(id: String): Goal? { return goals.find { it.id == id } }
 }
