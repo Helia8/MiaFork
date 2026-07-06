@@ -58,6 +58,8 @@ class NpcEntity(
                 tag.text(config.customName.miniMsg())
                 tag.billboard = Display.Billboard.VERTICAL
                 tag.setTransformationMatrix(Matrix4f().translate(0f, config.nametagHeight.toFloat(), 0f))
+                tag.backgroundColor = org.bukkit.Color.fromARGB(0, 255, 255, 255)
+                tag.brightness = Display.Brightness(15, 15)
             }
             entity.addPassenger(nametag)
         }
