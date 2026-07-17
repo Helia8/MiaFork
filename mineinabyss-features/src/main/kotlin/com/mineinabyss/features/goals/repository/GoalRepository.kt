@@ -52,8 +52,8 @@ class GoalRepository(
     }
 
 
-    fun recordFact(player: Player, kind: FactKind, value: String) {
-        goals.forEach { goal -> applyFact(player, goal, kind, value) }
+    fun recordFact(player: Player, kind: FactKind, value: String = "true", amount: Int = 1) { // true default value for one-off facts
+        goals.forEach { goal -> applyFact(player, goal, kind, value, amount) }
     }
 
     // Seeds regions the player is already standing in, since enter events only fire on transitions
@@ -61,13 +61,13 @@ class GoalRepository(
         regions.forEach { recordFact(player, FactKind.REGION_ENTER, it) }
     }
 
-    private fun applyFact(player: Player, goal: Goal, kind: FactKind, value: String) {
+    private fun applyFact(player: Player, goal: Goal, kind: FactKind, value: String, amount: Int) {
         if (!goal.tracksAny(kind, value)) return
         updateProgress(player, goal) { progress ->
             val updated = progress.conditions.toMutableMap()
             goal.conditions.forEachIndexed { i, condition ->
                 if (condition.tracks(kind, value))
-                    updated[i] = condition.advance(updated[i] ?: ConditionProgress(), value)
+                    updated[i] = condition.advance(updated[i] ?: ConditionProgress(), value, amount)
             }
             progress.copy(conditions = updated)
         }

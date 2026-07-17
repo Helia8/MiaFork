@@ -1,8 +1,12 @@
 package com.mineinabyss.features.achievements
 
 import com.mineinabyss.features.goals.FactKind
+import com.mineinabyss.features.goals.goalListener.itemFactIds
+import com.mineinabyss.features.goals.goalListener.killFactIds
 import com.mineinabyss.geary.papermc.spawning.locations.PlayerEnterRegionEvent
+import com.mineinabyss.staminaclimb.Events.PlayerClimbEvent
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent
@@ -29,12 +33,23 @@ class AchievementListener(
     @EventHandler(ignoreCancelled = true)
     fun CraftItemEvent.onCraft() {
         val player = whoClicked as? Player ?: return
-        manager.repository.recordFact(player, FactKind.CRAFT, recipe.result.type.key.asString())
+        recipe.result.itemFactIds(player.world).forEach { manager.repository.recordFact(player, FactKind.CRAFT, it) }
     }
 
     @EventHandler
     fun EntityDeathEvent.onKill() {
         val killer = entity.killer ?: return
-        manager.repository.recordFact(killer, FactKind.KILL, entity.type.key.asString())
+        entity.killFactIds().forEach { manager.repository.recordFact(killer, FactKind.KILL, it) }
+    }
+
+    @EventHandler
+    fun PlayerClimbEvent.onClimb() {
+        manager.repository.recordFact(player, FactKind.CLIMB)
+    }
+
+    @EventHandler
+    fun EntityPickupItemEvent.onPickup() {
+        val player = entity as? Player ?: return
+        item.itemStack.itemFactIds(player.world).forEach { manager.repository.recordFact(player, FactKind.PICKUP, it, item.itemStack.amount) }
     }
 }
