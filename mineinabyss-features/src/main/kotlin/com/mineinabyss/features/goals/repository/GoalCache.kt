@@ -22,6 +22,10 @@ class GoalCache {
 
     operator fun get(player: Player, goalId: String): GoalProgress? { return players[player.uniqueId]?.get(goalId) }
 
+    fun remove(player: Player, goalId: String) {
+        players[player.uniqueId]?.remove(goalId)
+    }
+
     operator fun set(player: Player, goalId: String, progress: GoalProgress) {
         players[player.uniqueId]?.put(goalId, progress)
     }

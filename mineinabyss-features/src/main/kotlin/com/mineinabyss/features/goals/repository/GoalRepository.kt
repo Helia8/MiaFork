@@ -52,6 +52,24 @@ class GoalRepository(
     }
 
 
+    // For goals whose rewards are claimed after completion (quests); updateProgress won't touch completed goals
+    fun markRewardClaimed(player: Player, goal: Goal) {
+        val current = cache[player, goal.id] ?: return
+        if (current.rewardClaimed) return
+        persist(player, goal.id, current.copy(rewardClaimed = true))
+    }
+
+    // reset progress
+    fun resetGoal(player: Player, goal: Goal) {
+        if (cache[player, goal.id] == null) return
+        persist(player, goal.id, GoalProgress())
+    }
+
+    fun removeGoal(player: Player, goal: Goal) {
+        cache.remove(player, goal.id)
+        player.launchWrite { store.remove(player, goal.id) }
+    }
+
     fun recordFact(player: Player, kind: FactKind, value: String = "true", amount: Int = 1) { // true default value for one-off facts
         goals.forEach { goal -> applyFact(player, goal, kind, value, amount) }
     }
