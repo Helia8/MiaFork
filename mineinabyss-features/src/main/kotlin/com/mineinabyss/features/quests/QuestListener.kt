@@ -6,7 +6,6 @@ import com.mineinabyss.features.goals.goalListener.killFactIds
 import com.mineinabyss.geary.papermc.spawning.locations.PlayerEnterRegionEvent
 import com.mineinabyss.geary.papermc.spawning.locations.RegionService
 import com.mineinabyss.idofront.plugin.Services
-import com.mineinabyss.staminaclimb.Events.PlayerClimbEvent
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -45,11 +44,6 @@ class QuestListener(
     fun EntityDeathEvent.onKill() {
         val killer = entity.killer ?: return
         entity.killFactIds().forEach { repository.recordFact(killer, FactKind.KILL, it) }
-    }
-
-    @EventHandler
-    fun PlayerClimbEvent.onClimb() {
-        repository.recordFact(player, FactKind.CLIMB)
     }
 
     @EventHandler

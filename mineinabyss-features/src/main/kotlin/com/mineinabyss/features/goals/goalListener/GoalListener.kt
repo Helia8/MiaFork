@@ -5,17 +5,13 @@ import com.mineinabyss.features.goals.repository.GoalRepository
 import com.mineinabyss.idofront.plugin.Services
 import com.mineinabyss.geary.papermc.spawning.locations.PlayerEnterRegionEvent
 import com.mineinabyss.geary.papermc.spawning.locations.RegionService
-import com.mineinabyss.staminaclimb.Events.PlayerClimbEvent
-import io.papermc.paper.event.player.PlayerPickItemEvent
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.inventory.CraftItemEvent
-import org.bukkit.event.player.PlayerAttemptPickupItemEvent
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerPickupItemEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
 class GoalListener(
@@ -48,14 +44,8 @@ class GoalListener(
     }
 
     @EventHandler
-    fun PlayerClimbEvent.onClimb() {
-        repository.recordFact(player, FactKind.CLIMB)
-    }
-
-    @EventHandler
     fun EntityPickupItemEvent.onPickup() {
         val player = entity as? Player ?: return
         item.itemStack.itemFactIds(player.world).forEach { repository.recordFact(player, FactKind.PICKUP, it, item.itemStack.amount) }
     }
-
 }

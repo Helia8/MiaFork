@@ -4,7 +4,6 @@ import com.mineinabyss.features.goals.FactKind
 import com.mineinabyss.features.goals.goalListener.itemFactIds
 import com.mineinabyss.features.goals.goalListener.killFactIds
 import com.mineinabyss.geary.papermc.spawning.locations.PlayerEnterRegionEvent
-import com.mineinabyss.staminaclimb.Events.PlayerClimbEvent
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.EventHandler
@@ -40,11 +39,6 @@ class AchievementListener(
     fun EntityDeathEvent.onKill() {
         val killer = entity.killer ?: return
         entity.killFactIds().forEach { manager.repository.recordFact(killer, FactKind.KILL, it) }
-    }
-
-    @EventHandler
-    fun PlayerClimbEvent.onClimb() {
-        manager.repository.recordFact(player, FactKind.CLIMB)
     }
 
     @EventHandler

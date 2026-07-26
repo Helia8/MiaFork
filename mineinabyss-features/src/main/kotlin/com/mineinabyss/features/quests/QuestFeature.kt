@@ -9,6 +9,7 @@ import com.mineinabyss.dependencies.new
 import com.mineinabyss.dependencies.single
 import com.mineinabyss.features.AbyssFeatureConfig
 import com.mineinabyss.features.goals.ConditionProgress
+import com.mineinabyss.features.goals.goalListener.ClimbFactListener
 import com.mineinabyss.features.goals.repository.GoalCache
 import com.mineinabyss.features.goals.repository.GoalRepository
 import com.mineinabyss.idofront.Idofront
@@ -21,6 +22,7 @@ import com.mineinabyss.idofront.features.mainCommand
 import com.mineinabyss.idofront.features.singleConfig
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
+import org.bukkit.Bukkit
 
 
 val QuestFeature = module("quests") {
@@ -40,6 +42,9 @@ val QuestFeature = module("quests") {
     }
     Idofront.setupDataStore(QuestStore)
     listeners(new(::QuestListener))
+    if (Bukkit.getPluginManager().isPluginEnabled("StaminaClimb")) {
+        listeners(new(::ClimbFactListener))
+    }
 }.mainCommand {
     "quests" {
         description = "Commands for quests"

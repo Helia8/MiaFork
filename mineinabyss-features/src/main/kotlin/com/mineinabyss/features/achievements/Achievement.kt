@@ -2,7 +2,6 @@ package com.mineinabyss.features.achievements
 
 import com.mineinabyss.features.goals.Goal
 import com.mineinabyss.features.goals.GoalCondition
-import com.mineinabyss.idofront.serialization.SingleOrListSerializer
 import kotlinx.serialization.Serializable
 
 
@@ -11,7 +10,7 @@ data class Achievement(
     val id: String,
     val name: String,
     val description: String = "",
-    val requires: @Serializable(with = SingleOrListSerializer::class) List<String> = emptyList(),
+    val requires: List<String> = emptyList(),
     val conditions: List<GoalCondition> = emptyList(),
 ) {
     fun toGoal() = Goal(id, name, description, conditions)

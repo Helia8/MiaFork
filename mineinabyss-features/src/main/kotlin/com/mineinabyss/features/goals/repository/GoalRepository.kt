@@ -7,17 +7,22 @@ import com.mineinabyss.features.goals.dataStore.GoalProgress
 import com.mineinabyss.features.goals.dataStore.GoalProgressStore
 import com.mineinabyss.idofront.datastore.launchWrite
 import com.mineinabyss.idofront.datastore.read
+import com.mineinabyss.idofront.messaging.error
 import com.mineinabyss.idofront.messaging.success
+import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import kotlin.time.Clock
+
 
 class GoalRepository(
     private val goals: List<Goal>,
     private val cache: GoalCache,
     private val store: GoalProgressStore,
 ) {
-    var onComplete: (Player, Goal) -> Unit = { player, goal ->
+    var onComplete: (Player, Goal) -> Unit = onComplete@{ player, goal ->
         player.success("Goal completed: ${goal.name}") //TODO proper completion notification/rewards
+
     }
 
     suspend fun loadPlayer(player: Player) {

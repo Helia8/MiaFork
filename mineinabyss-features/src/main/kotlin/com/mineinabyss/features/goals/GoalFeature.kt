@@ -9,6 +9,7 @@ import com.mineinabyss.dependencies.new
 import com.mineinabyss.dependencies.single
 import com.mineinabyss.features.AbyssFeatureConfig
 import com.mineinabyss.features.goals.dataStore.GoalStore
+import com.mineinabyss.features.goals.goalListener.ClimbFactListener
 import com.mineinabyss.features.goals.goalListener.GoalListener
 import com.mineinabyss.features.goals.repository.GoalCache
 import com.mineinabyss.features.goals.repository.GoalRepository
@@ -25,6 +26,7 @@ import com.mineinabyss.idofront.messaging.error
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
 import com.mineinabyss.idofront.plugin.Services
+import org.bukkit.Bukkit
 
 val GoalFeature = module("goals") {
     require(get<AbyssFeatureConfig>().goals.enabled) { "Goals feature is disabled" }
@@ -36,6 +38,10 @@ val GoalFeature = module("goals") {
     single { GoalRepository(get<GoalsConfig>().goals, get(), GoalStore) }
     Idofront.setupDataStore(GoalStore)
     listeners(new(::GoalListener))
+
+    if (Bukkit.getPluginManager().isPluginEnabled("StaminaClimb")) {
+        listeners(new(::ClimbFactListener))
+    }
 }.mainCommand {
     "goals" {
         val goalIdArg = { Args.string().suggests { suggestFiltering(get<GoalsConfig>().goals.map { it.id }) } }

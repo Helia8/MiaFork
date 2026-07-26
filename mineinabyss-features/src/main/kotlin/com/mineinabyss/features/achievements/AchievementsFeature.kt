@@ -12,6 +12,7 @@ import com.mineinabyss.features.achievements.data.AchievementStore
 import com.mineinabyss.features.achievements.data.AdvancementStore
 import com.mineinabyss.features.achievements.data.AdvancementSyncListener
 import com.mineinabyss.features.goals.ConditionProgress
+import com.mineinabyss.features.goals.goalListener.ClimbFactListener
 import com.mineinabyss.features.goals.repository.GoalCache
 import com.mineinabyss.features.goals.repository.GoalRepository
 import com.mineinabyss.idofront.Idofront
@@ -24,6 +25,7 @@ import com.mineinabyss.idofront.features.mainCommand
 import com.mineinabyss.idofront.features.singleConfig
 import com.mineinabyss.idofront.messaging.info
 import com.mineinabyss.idofront.messaging.success
+import org.bukkit.Bukkit
 
 val AchievementsFeature = module("achievements") {
     require(get<AbyssFeatureConfig>().achievements.enabled) { "Achievements feature is disabled" }
@@ -41,17 +43,27 @@ val AchievementsFeature = module("achievements") {
     Idofront.setupDataStore(AchievementStore)
     Idofront.setupDataStore(AdvancementStore)
     listeners(new(::AdvancementSyncListener), new(::AchievementListener))
-
-
+    if (Bukkit.getPluginManager().isPluginEnabled("StaminaClimb")) {
+        listeners(new(::ClimbFactListener))
+    }
 }.mainCommand {
     "achievement" {
-        val achievementIdArg = { Args.string().suggests { suggestFiltering(get<AchievementsConfig>().achievements.map { it.id }) } }
+        val achievementIdArg = { Args.greedyString().suggests { suggestFiltering(get<AchievementsConfig>().achievements.map { it.id }) } }
 
         "unlock" {
             executes.asPlayer().args("achievement" to achievementIdArg()) { id ->
                 val achievement = get<AchievementsConfig>().byId(id) ?: fail("Unknown achievement $id")
                 get<AchievementManager>().repository.forceComplete(player, achievement.toGoal())
                 sender.success("Unlocked achievement ${achievement.name}")
+            }
+        }
+        "reset" {
+            executes.asPlayer().args("achievement" to achievementIdArg()) { id ->
+                val achievement = get<AchievementsConfig>().byId(id) ?: fail("Unknown achievement $id")
+                val manager = get<AchievementManager>()
+                manager.repository.resetGoal(player, achievement.toGoal())
+                manager.onReset(player, achievement.toGoal())
+                sender.success("Reset progress for achievement ${achievement.name}")
             }
         }
         "status" {
